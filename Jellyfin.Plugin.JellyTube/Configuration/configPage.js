@@ -395,7 +395,7 @@
                     ? '<span class="yt-tool-ok">&#10003;</span> yt-dlp ' + escHtml(t.YtDlpVersion || '')
                     : '<span class="yt-tool-err">&#10007;</span> yt-dlp nicht gefunden' + (t.YtDlpError ? ' (' + escHtml(t.YtDlpError) + ')' : '');
                 document.getElementById('yt-tool-ffmpeg').innerHTML = t.FfmpegAvailable
-                    ? '<span class="yt-tool-ok">&#10003;</span> ffmpeg ' + escHtml((t.FfmpegVersion || '').split(' ').slice(0, 3).join(' '))
+                    ? '<span class="yt-tool-ok">&#10003;</span> ' + escHtml((t.FfmpegVersion || '').split(' ').slice(0, 3).join(' '))
                     : '<span class="yt-tool-err">&#10007;</span> ffmpeg nicht gefunden' + (t.FfmpegError ? ' (' + escHtml(t.FfmpegError) + ')' : '');
             })
             .catch(function (err) {
@@ -462,6 +462,16 @@
         document.getElementById('yt-fetch-meta-btn').addEventListener('click', fetchMetadata);
         document.getElementById('yt-download-btn').addEventListener('click', enqueueDownload);
         document.getElementById('yt-refresh-btn').addEventListener('click', refreshJobs);
+
+        document.getElementById('yt-clear-finished-btn').addEventListener('click', function () {
+            fetch(API_BASE + '/jobs/finished', { method: 'DELETE', headers: apiHeaders() })
+                .then(function (r) { return r.ok ? r.json() : Promise.reject(r.statusText); })
+                .then(function (count) {
+                    showToast(count + ' Job(s) entfernt.');
+                    refreshJobs();
+                })
+                .catch(function (err) { showToast('Fehler: ' + err); });
+        });
 
         document.getElementById('yt-cancel-all-btn').addEventListener('click', function () {
             if (!confirm('Alle aktiven und wartenden Jobs wirklich abbrechen?')) return;

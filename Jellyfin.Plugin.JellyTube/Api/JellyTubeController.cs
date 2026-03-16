@@ -203,6 +203,17 @@ public class JellyTubeController : ControllerBase
     }
 
     /// <summary>
+    /// Removes all completed, failed, and cancelled jobs from the list.
+    /// </summary>
+    [HttpDelete("jobs/finished")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public ActionResult<int> ClearFinishedJobs()
+    {
+        var count = _queue.ClearFinished();
+        return Ok(count);
+    }
+
+    /// <summary>
     /// Cancels all active (queued or in-progress) jobs.
     /// </summary>
     [HttpDelete("jobs")]

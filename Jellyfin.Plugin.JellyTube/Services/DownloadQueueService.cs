@@ -90,6 +90,25 @@ public class DownloadQueueService
     }
 
     /// <summary>
+    /// Removes all completed, failed, and cancelled jobs from the in-memory list immediately.
+    /// </summary>
+    public int ClearFinished()
+    {
+        int count = 0;
+        foreach (var kvp in _jobs)
+        {
+            if (kvp.Value.Status is DownloadJobStatus.Completed
+                                 or DownloadJobStatus.Failed
+                                 or DownloadJobStatus.Cancelled)
+            {
+                _jobs.TryRemove(kvp.Key, out _);
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /// <summary>
     /// Removes completed, failed, or cancelled jobs older than the given age from the in-memory list.
     /// </summary>
     public void PruneOldJobs(TimeSpan maxAge)
