@@ -26,14 +26,16 @@ public class JellyTubeController : ControllerBase
 {
     private readonly DownloadQueueService _queue;
     private readonly YtDlpService _ytDlp;
+    private readonly DownloadArchiveService _archive;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JellyTubeController"/> class.
     /// </summary>
-    public JellyTubeController(DownloadQueueService queue, YtDlpService ytDlp)
+    public JellyTubeController(DownloadQueueService queue, YtDlpService ytDlp, DownloadArchiveService archive)
     {
         _queue = queue;
         _ytDlp = ytDlp;
+        _archive = archive;
     }
 
     /// <summary>
@@ -198,6 +200,17 @@ public class JellyTubeController : ControllerBase
         {
             return (false, null, ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Clears the download archive so all scheduled playlist videos can be re-downloaded.
+    /// </summary>
+    [HttpDelete("archive")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public IActionResult ClearArchive()
+    {
+        _archive.Clear();
+        return NoContent();
     }
 
     /// <summary>

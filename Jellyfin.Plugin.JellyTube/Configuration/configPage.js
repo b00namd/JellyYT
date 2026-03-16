@@ -446,6 +446,17 @@
             addEntryRow('', '', 0, false);
         });
 
+        document.getElementById('yt-clear-archive-btn').addEventListener('click', function () {
+            if (!confirm('Download-Archiv wirklich zurücksetzen? Alle geplanten Playlist-Videos werden beim nächsten Task erneut heruntergeladen.'))
+                return;
+            fetch(API_BASE + '/archive', { method: 'DELETE', headers: apiHeaders() })
+                .then(function (r) {
+                    if (r.status === 204) showToast('Archiv wurde zurückgesetzt.');
+                    else showToast('Fehler beim Zurücksetzen: ' + r.statusText);
+                })
+                .catch(function (err) { showToast('Fehler: ' + err); });
+        });
+
         document.getElementById('yt-save-btn').addEventListener('click', saveConfig);
         document.getElementById('yt-fetch-meta-btn').addEventListener('click', fetchMetadata);
         document.getElementById('yt-download-btn').addEventListener('click', enqueueDownload);

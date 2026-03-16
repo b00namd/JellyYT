@@ -55,6 +55,20 @@ public class DownloadArchiveService
         }
     }
 
+    /// <summary>
+    /// Clears the archive file and the in-memory set so all videos can be re-downloaded.
+    /// </summary>
+    public void Clear()
+    {
+        lock (_lock)
+        {
+            _videoIds.Clear();
+            if (File.Exists(_archivePath))
+                File.Delete(_archivePath);
+            _logger.LogInformation("Download archive cleared.");
+        }
+    }
+
     private HashSet<string> Load()
     {
         var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
