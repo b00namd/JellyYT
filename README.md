@@ -1,10 +1,19 @@
-# JellyTube – Jellyfin Plugin
+# JellyTube & JellyTubbing – Jellyfin Plugins
 
-Ein Jellyfin-Plugin zum Herunterladen von YouTube-Videos und Playlists direkt in die Mediathek. Nutzt [yt-dlp](https://github.com/yt-dlp/yt-dlp) für den Download und erstellt automatisch NFO-Metadaten sowie Vorschaubilder.
+Zwei Jellyfin-Plugins rund um YouTube:
+
+| Plugin | Zweck |
+|---|---|
+| **JellyTube** | YouTube-Videos herunterladen und in die Mediathek speichern |
+| **JellyTubbing** | YouTube-Videos direkt in Jellyfin streamen (ohne Download) |
 
 ---
 
-## Features
+## JellyTube
+
+Lädt YouTube-Videos und Playlists direkt in die Mediathek. Nutzt [yt-dlp](https://github.com/yt-dlp/yt-dlp) für den Download und erstellt automatisch NFO-Metadaten sowie Vorschaubilder.
+
+### Features
 
 - Videos und Playlists per URL herunterladen
 - Metadaten-Vorschau vor dem Download
@@ -25,41 +34,7 @@ Ein Jellyfin-Plugin zum Herunterladen von YouTube-Videos und Playlists direkt in
 - yt-dlp und ffmpeg Verfügbarkeitscheck in den Einstellungen
 - Vollständig auf Deutsch
 
----
-
-## Installation
-
-### 1. Repository hinzufügen
-
-In Jellyfin:
-**Admin Dashboard → Plugins → Repositories → Hinzufügen**
-
-Repository-URL:
-```
-https://raw.githubusercontent.com/b00namd/JellyTube/master/dist/manifest.json
-```
-
-### 2. Plugin installieren
-
-**Admin Dashboard → Plugins → Katalog → JellyTube → Installieren**
-
-### 3. Jellyfin neu starten
-
-Nach der Installation muss Jellyfin neu gestartet werden.
-
----
-
-## Voraussetzungen
-
-- Jellyfin 10.9.x oder neuer
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) auf dem Server installiert
-- [ffmpeg](https://ffmpeg.org/) für Containerkonvertierung (mp4/mkv)
-
-yt-dlp und ffmpeg können entweder im Systempfad (PATH) liegen oder der vollständige Pfad wird in den Plugin-Einstellungen angegeben.
-
----
-
-## Einstellungen
+### Einstellungen
 
 | Einstellung | Beschreibung |
 |---|---|
@@ -81,10 +56,73 @@ yt-dlp und ffmpeg können entweder im Systempfad (PATH) liegen oder der vollstä
 
 ---
 
+## JellyTubbing
+
+Streamt YouTube-Videos direkt in Jellyfin – ohne Download. Nutzt [Invidious](https://invidious.io) als primäre Quelle für Stream-URLs, mit [yt-dlp](https://github.com/yt-dlp/yt-dlp) als automatischem Fallback.
+
+Nach der Installation erscheint JellyTubbing als **Kanal** in Jellyfin (Dashboard → Kanäle).
+
+### Features
+
+- Trending-Videos direkt in Jellyfin durchsuchen und abspielen
+- Suche über die Jellyfin-Suchfunktion
+- Invidious als primäre Stream-Quelle (keine YouTube-API notwendig)
+- Automatischer yt-dlp-Fallback wenn Invidious keinen Stream liefert
+- Konfigurierbare bevorzugte Qualität (360p–1080p)
+- Konfigurierbare Trending-Region (z. B. DE, US)
+- Konnektivitätstest für die Invidious-Instanz direkt in den Einstellungen
+
+### Einstellungen
+
+| Einstellung | Beschreibung |
+|---|---|
+| Invidious-Instanz URL | URL einer Invidious-Instanz (eigene empfohlen) |
+| yt-dlp Programmpfad | Optionaler Pfad zur yt-dlp-Binary für den Fallback |
+| Bevorzugte Qualität | Maximale Stream-Auflösung (360p, 480p, 720p, 1080p) |
+| Trending-Region | ISO 3166-1 alpha-2 Ländercode (z. B. DE, US, GB) |
+
+### Invidious-Instanz
+
+Eine eigene Invidious-Instanz ist am zuverlässigsten. Öffentliche Instanzen: [api.invidious.io](https://api.invidious.io)
+
+---
+
+## Installation
+
+### 1. Repository hinzufügen
+
+In Jellyfin:
+**Admin Dashboard → Plugins → Repositories → Hinzufügen**
+
+Repository-URL:
+```
+https://raw.githubusercontent.com/b00namd/JellyTube/master/dist/manifest.json
+```
+
+### 2. Plugins installieren
+
+**Admin Dashboard → Plugins → Katalog → JellyTube / JellyTubbing → Installieren**
+
+### 3. Jellyfin neu starten
+
+Nach der Installation muss Jellyfin neu gestartet werden.
+
+---
+
+## Voraussetzungen
+
+- Jellyfin 10.9.x oder neuer
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) auf dem Server installiert
+- [ffmpeg](https://ffmpeg.org/) für Containerkonvertierung (mp4/mkv) – nur für JellyTube
+
+yt-dlp und ffmpeg können entweder im Systempfad (PATH) liegen oder der vollständige Pfad wird in den Plugin-Einstellungen angegeben.
+
+---
+
 ## Selbst bauen
 
 ```powershell
-# Plugin bauen und ZIP + Manifest erstellen
+# Beide Plugins bauen, ZIPs und Manifest erstellen
 .\build.ps1
 ```
 
@@ -92,4 +130,4 @@ yt-dlp und ffmpeg können entweder im Systempfad (PATH) liegen oder der vollstä
 
 ## Hinweis
 
-Dieses Plugin ermöglicht das Herunterladen von YouTube-Inhalten. Das Herunterladen von Videos kann gegen die Nutzungsbedingungen von YouTube verstoßen. Die Nutzung erfolgt auf eigene Verantwortung und sollte ausschließlich für den persönlichen Gebrauch erfolgen.
+Diese Plugins ermöglichen den Zugriff auf YouTube-Inhalte. Das Herunterladen und Streamen von Videos kann gegen die Nutzungsbedingungen von YouTube verstoßen. Die Nutzung erfolgt auf eigene Verantwortung und sollte ausschließlich für den persönlichen Gebrauch erfolgen.
