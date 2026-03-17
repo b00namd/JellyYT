@@ -47,7 +47,7 @@ function Build-Plugin {
 
     Write-Host ""
     Write-Host "Building $PluginName ..." -ForegroundColor Cyan
-    dotnet publish "$ProjectDir" -c Release -o "$publishDir" --no-self-contained
+    dotnet publish "$ProjectDir" -c Release -o "$publishDir" --no-self-contained | Out-Host
     if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for $PluginName" }
 
     # Remove Jellyfin framework DLLs

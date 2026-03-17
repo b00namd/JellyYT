@@ -1,17 +1,12 @@
 [
-    "  Wiederherzustellende Projekte werden ermittelt...",
-    "  Alle Projekte sind f├╝r die Wiederherstellung auf dem neuesten Stand.",
-    "C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\Jellyfin.Plugin.JellyTube\\Services\\YtDlpService.cs(182,13): warning CS0618: \"OptionSet.BreakOnReject\" ist veraltet: \"Deprecated in favor of: Use --break-match-filter.\" [C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\Jellyfin.Plugin.JellyTube\\Jellyfin.Plugin.JellyTube.csproj]",
-    "  Jellyfin.Plugin.JellyTube -\u003e C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\Jellyfin.Plugin.JellyTube\\bin\\Release\\net8.0\\Jellyfin.Plugin.JellyTube.dll",
-    "  Jellyfin.Plugin.JellyTube -\u003e C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\dist\\publish-Jellyfin.Plugin.JellyTube\\",
     {
         "owner":  "local",
         "versions":  [
                          {
                              "changelog":  "Initiale Version",
                              "version":  "1.0.0.0",
-                             "checksum":  "5e28e9ab975e4bc2b8a0a0926d8c58d9",
-                             "timestamp":  "2026-03-17T21:39:25Z",
+                             "checksum":  "5b42df21dd276ec885dbcbbf33f68bc2",
+                             "timestamp":  "2026-03-17T21:41:07Z",
                              "targetAbi":  "10.9.0.0",
                              "sourceUrl":  "https://raw.githubusercontent.com/b00namd/JellyYT/master/dist/Jellyfin.Plugin.JellyTube_1.0.0.0.zip"
                          }
@@ -23,18 +18,14 @@
         "description":  "YouTube-Videos und Playlists direkt in die Jellyfin-Mediathek herunterladen.",
         "imageUrl":  "https://raw.githubusercontent.com/b00namd/JellyYT/master/Jellyfin.Plugin.JellyTube/thumb.png"
     },
-    "  Wiederherzustellende Projekte werden ermittelt...",
-    "  Alle Projekte sind f├╝r die Wiederherstellung auf dem neuesten Stand.",
-    "  Jellyfin.Plugin.JellyTubbing -\u003e C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\Jellyfin.Plugin.JellyTubbing\\bin\\Release\\net8.0\\Jellyfin.Plugin.JellyTubbing.dll",
-    "  Jellyfin.Plugin.JellyTubbing -\u003e C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\dist\\publish-Jellyfin.Plugin.JellyTubbing\\",
     {
         "owner":  "local",
         "versions":  [
                          {
                              "changelog":  "Initiale Version",
                              "version":  "1.0.0.0",
-                             "checksum":  "88aa311eeb49b0ff53008fc73e40ff6d",
-                             "timestamp":  "2026-03-17T21:39:25Z",
+                             "checksum":  "4a1d887480a77fde5a4db30ce4e50f4b",
+                             "timestamp":  "2026-03-17T21:41:07Z",
                              "targetAbi":  "10.9.0.0",
                              "sourceUrl":  "https://raw.githubusercontent.com/b00namd/JellyYT/master/dist/Jellyfin.Plugin.JellyTubbing_1.0.0.0.zip"
                          }
