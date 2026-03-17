@@ -208,7 +208,7 @@
 
                         <div class="inputContainer">
                             <label class="inputLabel" for="PreferredContainer">Bevorzugter Container</label>
-                            <select id="PreferredContainer" name="PreferredContainer" is="emby-select">
+                            <select id="PreferredContainer" name="PreferredContainer" is="emby-select" style="max-width:160px;">
                                 <option value="mp4">MP4</option>
                                 <option value="mkv">MKV</option>
                                 <option value="webm">WebM</option>
@@ -218,7 +218,7 @@
                         <div class="inputContainer">
                             <label class="inputLabel" for="MaxConcurrentDownloads">Maximale gleichzeitige Downloads</label>
                             <input id="MaxConcurrentDownloads" name="MaxConcurrentDownloads" type="number"
-                                   is="emby-input" min="1" max="10" />
+                                   is="emby-input" min="1" max="10" style="max-width:80px;" />
                         </div>
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
@@ -239,14 +239,14 @@
                         <div class="inputContainer">
                             <label class="inputLabel" for="SubtitleLanguages">Untertitelsprachen</label>
                             <input id="SubtitleLanguages" name="SubtitleLanguages" type="text" is="emby-input"
-                                   placeholder="en,de" />
+                                   placeholder="en,de" style="max-width:200px;" />
                             <div class="fieldDescription">Kommagetrennte Sprachcodes.</div>
                         </div>
 
                         <div class="inputContainer">
                             <label class="inputLabel" for="DefaultAudioLanguage">Standard-Audiosprache</label>
                             <input id="DefaultAudioLanguage" name="DefaultAudioLanguage" type="text" is="emby-input"
-                                   placeholder="deu" />
+                                   placeholder="deu" style="max-width:120px;" />
                             <div class="fieldDescription">ISO 639-2 Code (z.B. deu, eng, fra). Wird via ffmpeg in die Audiodatei eingebettet, damit Jellyfin die Sprache korrekt anzeigt. Leer lassen = kein Tag.</div>
                         </div>
 
@@ -347,7 +347,7 @@
 
                     <div style="margin-bottom:1em;">
                         <button id="yt-fetch-meta-btn" is="emby-button" type="button" class="raised">
-                            Metadaten vorschau
+                            Metadaten-Vorschau
                         </button>
                         &nbsp;
                         <button id="yt-download-btn" is="emby-button" type="button" class="raised button-submit">
