@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -47,6 +48,13 @@ public class DownloadWorkerService : BackgroundService
         _archive = archive;
         _libraryManager = libraryManager;
         _logger = logger;
+    }
+
+    /// <inheritdoc />
+    public override Task StartAsync(CancellationToken cancellationToken)
+    {
+        KillOrphanedYtDlpProcesses();
+        return base.StartAsync(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -119,13 +127,18 @@ public class DownloadWorkerService : BackgroundService
             ? await _ytDlp.DownloadPlaylistAsync(job.Url, outputDir, downloadProgress, ct, archivePath, job.MaxAgeDays)
             : await _ytDlp.DownloadVideoAsync(job.Url, outputDir, downloadProgress, ct, archivePath);
 
-        if (!success)
+        if (!success && !job.IsPlaylist)
         {
             job.Status = DownloadJobStatus.Failed;
             job.ErrorMessage = "yt-dlp hat einen Fehler gemeldet.";
             job.CompletedAt = DateTime.UtcNow;
             _logger.LogWarning("Job {Id} failed during download.", job.Id);
             return;
+        }
+
+        if (!success)
+        {
+            _logger.LogWarning("Job {Id}: playlist download reported errors (some videos may be unavailable). Writing metadata for successful downloads.", job.Id);
         }
 
         // Step 3 – write NFO and thumbnails
@@ -257,6 +270,42 @@ public class DownloadWorkerService : BackgroundService
         catch (Exception)
         {
             return null;
+        }
+    }
+
+    private void KillOrphanedYtDlpProcesses()
+    {
+        try
+        {
+            var binaryPath = Plugin.Instance?.Configuration.YtDlpBinaryPath;
+            var processName = string.IsNullOrWhiteSpace(binaryPath)
+                ? "yt-dlp"
+                : Path.GetFileNameWithoutExtension(binaryPath);
+
+            var procs = Process.GetProcessesByName(processName);
+            foreach (var proc in procs)
+            {
+                try
+                {
+                    proc.Kill(entireProcessTree: true);
+                    _logger.LogInformation("Killed orphaned yt-dlp process {Pid}.", proc.Id);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Could not kill yt-dlp process {Pid}.", proc.Id);
+                }
+                finally
+                {
+                    proc.Dispose();
+                }
+            }
+
+            if (procs.Length > 0)
+                _logger.LogInformation("Killed {Count} orphaned yt-dlp process(es) on startup.", procs.Length);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error while killing orphaned yt-dlp processes on startup.");
         }
     }
 

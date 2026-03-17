@@ -169,9 +169,9 @@ public class YtDlpService
             WriteAutoSubs = config.DownloadSubtitles,
             WriteSubs = config.DownloadSubtitles,
             SubLangs = config.DownloadSubtitles ? config.SubtitleLanguages : null,
-            RestrictFilenames = true,
             NoPlaylist = !playlist,
-            WriteInfoJson = playlist   // write per-video .info.json so metadata can be read back for all items
+            WriteInfoJson = playlist,  // write per-video .info.json so metadata can be read back for all items
+            IgnoreErrors = playlist    // skip unavailable/deleted videos instead of aborting the whole playlist
         };
 
         // Per-entry maxAgeDays takes priority; fall back to global setting
@@ -179,6 +179,12 @@ public class YtDlpService
         if (playlist && effectiveMaxAge > 0)
         {
             opts.DateAfter = DateTime.UtcNow.AddDays(-effectiveMaxAge);
+        }
+
+        // Embed audio language tag via ffmpeg post-processor
+        if (!string.IsNullOrWhiteSpace(config.DefaultAudioLanguage))
+        {
+            opts.PostprocessorArgs = $"ffmpeg:-metadata:s:a:0 language={config.DefaultAudioLanguage.Trim()}";
         }
 
         // Use archive file to skip already-downloaded (or deleted) videos

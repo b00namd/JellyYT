@@ -243,6 +243,13 @@
                             <div class="fieldDescription">Kommagetrennte Sprachcodes.</div>
                         </div>
 
+                        <div class="inputContainer">
+                            <label class="inputLabel" for="DefaultAudioLanguage">Standard-Audiosprache</label>
+                            <input id="DefaultAudioLanguage" name="DefaultAudioLanguage" type="text" is="emby-input"
+                                   placeholder="deu" />
+                            <div class="fieldDescription">ISO 639-2 Code (z.B. deu, eng, fra). Wird via ffmpeg in die Audiodatei eingebettet, damit Jellyfin die Sprache korrekt anzeigt. Leer lassen = kein Tag.</div>
+                        </div>
+
                         <div class="checkboxContainer checkboxContainer-withDescription">
                             <label class="emby-checkbox-label">
                                 <input id="WriteNfoFiles" name="WriteNfoFiles" type="checkbox" is="emby-checkbox" />
