@@ -1,5 +1,5 @@
-# Build script for Jellyfin.Plugin.JellyTube
-# Creates the plugin ZIP and manifest.json for installation via Jellyfin dashboard.
+# Build script for JellyTube + JellyTubbing plugins
+# Creates plugin ZIPs and a combined manifest.json for installation via Jellyfin dashboard.
 
 param(
     [string]$Version = "1.0.0.0",
@@ -8,25 +8,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
-$ProjectDir  = Join-Path $PSScriptRoot "Jellyfin.Plugin.JellyTube"
-$OutputDir   = Join-Path $PSScriptRoot "dist"
-$PublishDir  = Join-Path $OutputDir "publish"
-$ZipName     = "Jellyfin.Plugin.JellyTube_$($Version).zip"
-$ZipPath     = Join-Path $OutputDir $ZipName
+$OutputDir    = Join-Path $PSScriptRoot "dist"
 $ManifestPath = Join-Path $OutputDir "manifest.json"
+$timestamp    = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
 
-# --- 1. Clean ---
-Write-Host "Cleaning output directory..." -ForegroundColor Cyan
-if (Test-Path $OutputDir) { Remove-Item $OutputDir -Recurse -Force }
-New-Item -ItemType Directory -Path $PublishDir | Out-Null
-
-# --- 2. Build (Release) ---
-Write-Host "Building plugin (Release)..." -ForegroundColor Cyan
-dotnet publish "$ProjectDir" -c Release -o "$PublishDir" --no-self-contained
-if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
-
-# Remove Jellyfin's own DLLs – they must NOT be in the plugin ZIP
+# Jellyfin DLLs that must NOT be in plugin ZIPs
 $jellyfinDlls = @(
     "MediaBrowser.Common.dll",
     "MediaBrowser.Controller.dll",
@@ -34,56 +20,106 @@ $jellyfinDlls = @(
     "Microsoft.Extensions.*",
     "Newtonsoft.Json.dll"
 )
-foreach ($pattern in $jellyfinDlls) {
-    Get-ChildItem $PublishDir -Filter $pattern | Remove-Item -Force
-}
 
-# --- 3. ZIP ---
-Write-Host "Creating ZIP: $ZipName ..." -ForegroundColor Cyan
-Compress-Archive -Path "$PublishDir\*" -DestinationPath $ZipPath -Force
+# --- Clean dist ---
+Write-Host "Cleaning output directory..." -ForegroundColor Cyan
+if (Test-Path $OutputDir) { Remove-Item $OutputDir -Recurse -Force }
+New-Item -ItemType Directory -Path $OutputDir | Out-Null
 
-# --- 4. Checksum (MD5) ---
-$md5  = (Get-FileHash $ZipPath -Algorithm MD5).Hash.ToLower()
-$size = (Get-Item $ZipPath).Length
-Write-Host "MD5: $md5  ($size bytes)" -ForegroundColor Gray
+$manifestEntries = @()
 
-# --- 5. manifest.json ---
-Write-Host "Writing manifest.json..." -ForegroundColor Cyan
-$timestamp = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
+# ============================================================
+# Helper: build one plugin project
+# ============================================================
+function Build-Plugin {
+    param(
+        [string]$ProjectDir,
+        [string]$AssemblyName,
+        [string]$PluginName,
+        [string]$Description,
+        [string]$Overview,
+        [string]$Guid
+    )
 
-$manifest = @(
-    @{
+    $publishDir = Join-Path $OutputDir "publish-$AssemblyName"
+    $zipName    = "${AssemblyName}_${Version}.zip"
+    $zipPath    = Join-Path $OutputDir $zipName
+
+    Write-Host ""
+    Write-Host "Building $PluginName ..." -ForegroundColor Cyan
+    dotnet publish "$ProjectDir" -c Release -o "$publishDir" --no-self-contained
+    if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for $PluginName" }
+
+    # Remove Jellyfin framework DLLs
+    foreach ($pattern in $jellyfinDlls) {
+        Get-ChildItem $publishDir -Filter $pattern | Remove-Item -Force
+    }
+
+    Write-Host "Creating ZIP: $zipName ..." -ForegroundColor Cyan
+    Compress-Archive -Path "$publishDir\*" -DestinationPath $zipPath -Force
+
+    $md5  = (Get-FileHash $zipPath -Algorithm MD5).Hash.ToLower()
+    $size = (Get-Item $zipPath).Length
+    Write-Host "MD5: $md5  ($size bytes)" -ForegroundColor Gray
+
+    return @{
         category    = "General"
-        guid        = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-        name        = "JellyTube"
-        description = "YouTube-Videos und Playlists direkt in die Jellyfin-Mediathek herunterladen."
-        overview    = "Verwendet yt-dlp zum Herunterladen von YouTube-Inhalten und erstellt NFO-Metadaten sowie Vorschaubilder."
+        guid        = $Guid
+        name        = $PluginName
+        description = $Description
+        overview    = $Overview
         owner       = "local"
-        imageUrl    = "$RepoUrl/Jellyfin.Plugin.JellyTube/thumb.png"
+        imageUrl    = "$RepoUrl/$AssemblyName/thumb.png"
         versions    = @(
             @{
                 version    = $Version
                 changelog  = "Initiale Version"
                 targetAbi  = "10.9.0.0"
-                sourceUrl  = "$BaseUrl/$ZipName"
+                sourceUrl  = "$BaseUrl/$zipName"
                 checksum   = $md5
                 timestamp  = $timestamp
             }
         )
     }
-)
+}
 
-# Jellyfin expects the manifest as a top-level JSON array
-$json = ConvertTo-Json -InputObject $manifest -Depth 5
+# ============================================================
+# Build JellyTube
+# ============================================================
+$manifestEntries += Build-Plugin `
+    -ProjectDir  (Join-Path $PSScriptRoot "Jellyfin.Plugin.JellyTube") `
+    -AssemblyName "Jellyfin.Plugin.JellyTube" `
+    -PluginName  "JellyTube" `
+    -Description "YouTube-Videos und Playlists direkt in die Jellyfin-Mediathek herunterladen." `
+    -Overview    "Verwendet yt-dlp zum Herunterladen von YouTube-Inhalten und erstellt NFO-Metadaten sowie Vorschaubilder." `
+    -Guid        "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+
+# ============================================================
+# Build JellyTubbing
+# ============================================================
+$manifestEntries += Build-Plugin `
+    -ProjectDir  (Join-Path $PSScriptRoot "Jellyfin.Plugin.JellyTubbing") `
+    -AssemblyName "Jellyfin.Plugin.JellyTubbing" `
+    -PluginName  "JellyTubbing" `
+    -Description "YouTube-Videos direkt in Jellyfin streamen - via Invidious mit yt-dlp als Fallback." `
+    -Overview    "Nutzt Invidious als primaere Quelle fuer YouTube-Streams. yt-dlp dient als Fallback." `
+    -Guid        "c3d4e5f6-a7b8-9012-cdef-012345678901"
+
+# ============================================================
+# Write combined manifest.json
+# ============================================================
+Write-Host ""
+Write-Host "Writing manifest.json..." -ForegroundColor Cyan
+$json = ConvertTo-Json -InputObject $manifestEntries -Depth 5
 [System.IO.File]::WriteAllText($ManifestPath, $json, [System.Text.UTF8Encoding]::new($false))
 
 Write-Host ""
 Write-Host "==================================================" -ForegroundColor Green
 Write-Host " Build completed successfully!" -ForegroundColor Green
 Write-Host "==================================================" -ForegroundColor Green
-Write-Host " ZIP:      $ZipPath"
 Write-Host " Manifest: $ManifestPath"
-Write-Host ""
-Write-Host " Next step: run serve.ps1 to start the local" -ForegroundColor Yellow
-Write-Host " repository server, then add the URL to Jellyfin." -ForegroundColor Yellow
+$zipTube    = Join-Path $OutputDir "Jellyfin.Plugin.JellyTube_$Version.zip"
+$zipTubbing = Join-Path $OutputDir "Jellyfin.Plugin.JellyTubbing_$Version.zip"
+Write-Host " JellyTube:    $zipTube"
+Write-Host " JellyTubbing: $zipTubbing"
 Write-Host ""

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <title>JellyTubbing</title>
+    <meta name="language" content="de" />
+</head>
+<body>
+    <div id="JellyTubbingConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select">
+    <style>
+        .jt-section { margin-bottom: 2em; }
+        .jt-section h2 { border-bottom: 1px solid #444; padding-bottom: 0.3em; }
+        .jt-status-bar {
+            display: inline-flex; gap: 1em; align-items: center;
+            padding: 0.5em 1em; background: #1a1a1a; border: 1px solid #333;
+            border-radius: 6px; margin-bottom: 1.5em; font-size: 0.9em;
+        }
+        .jt-ok  { color: #4caf50; font-weight: bold; }
+        .jt-err { color: #f44336; font-weight: bold; }
+        .jt-info { color: #aaa; }
+    </style>
+
+        <div data-role="content">
+            <div class="content-primary">
+
+                <div class="jt-section">
+                    <h2>JellyTubbing – Einstellungen</h2>
+
+                    <div class="jt-status-bar" id="jt-invidious-status">
+                        <span class="jt-info">&#8987; Invidious-Status wird geprüft…</span>
+                    </div>
+
+                    <form id="jt-config-form">
+
+                        <div class="inputContainer">
+                            <label class="inputLabel" for="InvidiousInstanceUrl">Invidious-Instanz URL</label>
+                            <input id="InvidiousInstanceUrl" name="InvidiousInstanceUrl" type="text" is="emby-input"
+                                   placeholder="https://invidious.example.com" style="max-width:500px;" />
+                            <div class="fieldDescription">
+                                URL einer Invidious-Instanz. Eigene Instanz empfohlen für zuverlässige Nutzung.
+                                Öffentliche Instanzen: <a href="https://api.invidious.io" target="_blank">api.invidious.io</a>
+                            </div>
+                        </div>
+
+                        <div class="inputContainer">
+                            <label class="inputLabel" for="YtDlpBinaryPath">yt-dlp Programmpfad (Fallback, optional)</label>
+                            <input id="YtDlpBinaryPath" name="YtDlpBinaryPath" type="text" is="emby-input"
+                                   placeholder="z.B. /usr/local/bin/yt-dlp" style="max-width:500px;" />
+                            <div class="fieldDescription">
+                                Wird verwendet, wenn Invidious keinen Stream liefern kann. Leer lassen, wenn yt-dlp im PATH liegt.
+                            </div>
+                        </div>
+
+                        <div class="inputContainer">
+                            <label class="inputLabel" for="PreferredQuality">Bevorzugte Qualität</label>
+                            <select id="PreferredQuality" name="PreferredQuality" is="emby-select" style="max-width:160px;">
+                                <option value="1080p">1080p</option>
+                                <option value="720p">720p (Standard)</option>
+                                <option value="480p">480p</option>
+                                <option value="360p">360p</option>
+                            </select>
+                            <div class="fieldDescription">Maximale Auflösung für die progressive Invidious-Stream-Auflösung und yt-dlp-Fallback.</div>
+                        </div>
+
+                        <div class="inputContainer">
+                            <label class="inputLabel" for="TrendingRegion">Trending-Region</label>
+                            <input id="TrendingRegion" name="TrendingRegion" type="text" is="emby-input"
+                                   placeholder="DE" style="max-width:80px;" />
+                            <div class="fieldDescription">ISO 3166-1 alpha-2 Ländercode für Trending-Videos (z.B. DE, US, GB).</div>
+                        </div>
+
+                        <div style="margin-top:1em;">
+                            <button id="jt-test-btn" is="emby-button" type="button" class="raised">
+                                Invidious testen
+                            </button>
+                            &nbsp;
+                            <button id="jt-save-btn" is="emby-button" type="button" class="raised button-submit">
+                                Einstellungen speichern
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="jt-section">
+                    <h2>Hinweis</h2>
+                    <p style="color:#aaa;font-size:0.9em;">
+                        JellyTubbing erscheint als <strong>Kanal</strong> in deiner Jellyfin-Bibliothek (Dashboard → Kanäle).
+                        Dort kannst du Trending-Videos durchsuchen und YouTube-Videos direkt abspielen.
+                        Die Suche ist über die Jellyfin-Suchfunktion verfügbar.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <script src="/api/jellytubbing/ui"></script>
+    </div>
+</body>
+</html>

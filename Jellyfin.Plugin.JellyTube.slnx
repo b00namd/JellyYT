@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="Jellyfin.Plugin.JellyTube/Jellyfin.Plugin.JellyTube.csproj" />
+  <Project Path="Jellyfin.Plugin.JellyTubbing/Jellyfin.Plugin.JellyTubbing.csproj" />
 </Solution>

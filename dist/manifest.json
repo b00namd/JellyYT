@@ -1,12 +1,17 @@
 [
+    "  Wiederherzustellende Projekte werden ermittelt...",
+    "  Alle Projekte sind f├╝r die Wiederherstellung auf dem neuesten Stand.",
+    "C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\Jellyfin.Plugin.JellyTube\\Services\\YtDlpService.cs(182,13): warning CS0618: \"OptionSet.BreakOnReject\" ist veraltet: \"Deprecated in favor of: Use --break-match-filter.\" [C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\Jellyfin.Plugin.JellyTube\\Jellyfin.Plugin.JellyTube.csproj]",
+    "  Jellyfin.Plugin.JellyTube -\u003e C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\Jellyfin.Plugin.JellyTube\\bin\\Release\\net8.0\\Jellyfin.Plugin.JellyTube.dll",
+    "  Jellyfin.Plugin.JellyTube -\u003e C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\dist\\publish-Jellyfin.Plugin.JellyTube\\",
     {
         "owner":  "local",
         "versions":  [
                          {
                              "changelog":  "Initiale Version",
                              "version":  "1.0.0.0",
-                             "checksum":  "1faa9897b1e92419fefbc1ae4bf3ba00",
-                             "timestamp":  "2026-03-17T20:51:05Z",
+                             "checksum":  "12f45faff72cbf75a533a05dc2e3aa74",
+                             "timestamp":  "2026-03-17T21:25:50Z",
                              "targetAbi":  "10.9.0.0",
                              "sourceUrl":  "https://raw.githubusercontent.com/b00namd/JellyTube/master/dist/Jellyfin.Plugin.JellyTube_1.0.0.0.zip"
                          }
@@ -17,5 +22,28 @@
         "name":  "JellyTube",
         "description":  "YouTube-Videos und Playlists direkt in die Jellyfin-Mediathek herunterladen.",
         "imageUrl":  "https://raw.githubusercontent.com/b00namd/JellyTube/master/Jellyfin.Plugin.JellyTube/thumb.png"
+    },
+    "  Wiederherzustellende Projekte werden ermittelt...",
+    "  Alle Projekte sind f├╝r die Wiederherstellung auf dem neuesten Stand.",
+    "  Jellyfin.Plugin.JellyTubbing -\u003e C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\Jellyfin.Plugin.JellyTubbing\\bin\\Release\\net8.0\\Jellyfin.Plugin.JellyTubbing.dll",
+    "  Jellyfin.Plugin.JellyTubbing -\u003e C:\\Users\\b00na\\Nextcloud2\\Projekte\\JellyFin YT\\dist\\publish-Jellyfin.Plugin.JellyTubbing\\",
+    {
+        "owner":  "local",
+        "versions":  [
+                         {
+                             "changelog":  "Initiale Version",
+                             "version":  "1.0.0.0",
+                             "checksum":  "89a993bba61c5304e41d01d35ba86444",
+                             "timestamp":  "2026-03-17T21:25:50Z",
+                             "targetAbi":  "10.9.0.0",
+                             "sourceUrl":  "https://raw.githubusercontent.com/b00namd/JellyTube/master/dist/Jellyfin.Plugin.JellyTubbing_1.0.0.0.zip"
+                         }
+                     ],
+        "overview":  "Nutzt Invidious als primaere Quelle fuer YouTube-Streams. yt-dlp dient als Fallback.",
+        "category":  "General",
+        "guid":  "c3d4e5f6-a7b8-9012-cdef-012345678901",
+        "name":  "JellyTubbing",
+        "description":  "YouTube-Videos direkt in Jellyfin streamen - via Invidious mit yt-dlp als Fallback.",
+        "imageUrl":  "https://raw.githubusercontent.com/b00namd/JellyTube/master/Jellyfin.Plugin.JellyTubbing/thumb.png"
     }
 ]

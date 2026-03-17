@@ -1,0 +1,59 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Jellyfin.Plugin.JellyTube/1.0.0": {
+        "dependencies": {
+          "YoutubeDLSharp": "1.2.0"
+        },
+        "runtime": {
+          "Jellyfin.Plugin.JellyTube.dll": {}
+        }
+      },
+      "Newtonsoft.Json/13.0.3": {
+        "runtime": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.3.27908"
+          }
+        }
+      },
+      "YoutubeDLSharp/1.2.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.3"
+        },
+        "runtime": {
+          "lib/net8.0/YoutubeDLSharp.dll": {
+            "assemblyVersion": "1.2.0.265",
+            "fileVersion": "1.2.0.265"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Jellyfin.Plugin.JellyTube/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Newtonsoft.Json/13.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ==",
+      "path": "newtonsoft.json/13.0.3",
+      "hashPath": "newtonsoft.json.13.0.3.nupkg.sha512"
+    },
+    "YoutubeDLSharp/1.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-esghiFEljotgAIQN30+fgv9sfHp7RIpqXzrtg/rEvmNjpKMDhE5nL0eiufWV29I8lAY9EcSC8w+5rjAY7vmC2w==",
+      "path": "youtubedlsharp/1.2.0",
+      "hashPath": "youtubedlsharp.1.2.0.nupkg.sha512"
+    }
+  }
+}

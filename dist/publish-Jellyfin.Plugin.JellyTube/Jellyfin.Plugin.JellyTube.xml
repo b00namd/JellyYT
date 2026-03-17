@@ -1,0 +1,647 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jellyfin.Plugin.JellyTube</name>
+    </assembly>
+    <members>
+        <member name="T:Jellyfin.Plugin.JellyTube.Api.JellyTubeController">
+            <summary>
+            REST API endpoints for the YouTube Downloader plugin.
+            All endpoints require Jellyfin admin privileges.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.#ctor(Jellyfin.Plugin.JellyTube.Services.DownloadQueueService,Jellyfin.Plugin.JellyTube.Services.YtDlpService,Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.Api.JellyTubeController"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.EnqueueDownload(Jellyfin.Plugin.JellyTube.Api.EnqueueRequest)">
+            <summary>
+            Enqueues a new download job.
+            </summary>
+            <param name="request">The URL and playlist flag.</param>
+            <returns>The created <see cref="T:Jellyfin.Plugin.JellyTube.Models.DownloadJob"/>.</returns>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.GetJobs">
+            <summary>
+            Returns all download jobs (active, pending, and completed).
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.GetJob(System.Guid)">
+            <summary>
+            Returns a single job by its ID.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.CancelJob(System.Guid)">
+            <summary>
+            Cancels a queued job.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.FetchMetadata(Jellyfin.Plugin.JellyTube.Api.FetchMetadataRequest,System.Threading.CancellationToken)">
+            <summary>
+            Fetches metadata for a YouTube URL without downloading it.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.GetUiScript">
+            <summary>
+            Serves the plugin UI JavaScript file.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.CheckTools">
+            <summary>
+            Checks whether yt-dlp and ffmpeg are available and returns their versions.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.ClearFinishedJobs">
+            <summary>
+            Removes all completed, failed, and cancelled jobs from the list.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.CancelAllJobs">
+            <summary>
+            Cancels all active (queued or in-progress) jobs.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.ClearArchive">
+            <summary>
+            Clears the download archive so all scheduled playlist videos can be re-downloaded.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.JellyTubeController.GetStatus">
+            <summary>
+            Returns a summary of queue statistics.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Api.EnqueueRequest">
+            <summary>Request body for enqueuing a download.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.EnqueueRequest.#ctor(System.String,System.Boolean,System.String)">
+            <summary>Request body for enqueuing a download.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Api.FetchMetadataRequest">
+            <summary>Request body for fetching metadata.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.FetchMetadataRequest.#ctor(System.String)">
+            <summary>Request body for fetching metadata.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Api.QueueStatus">
+            <summary>Summary of the download queue state.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.QueueStatus.#ctor(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>Summary of the download queue state.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Api.ToolsCheckResult">
+            <summary>Availability and version info for required tools.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Api.ToolsCheckResult.#ctor(System.Boolean,System.String,System.String,System.Boolean,System.String,System.String)">
+            <summary>Availability and version info for required tools.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration">
+            <summary>
+            Plugin configuration.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.DownloadPath">
+            <summary>
+            Gets or sets the base directory where downloaded videos are stored.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.YtDlpBinaryPath">
+            <summary>
+            Gets or sets the path to the yt-dlp binary. Leave empty to use the one on PATH.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.FfmpegBinaryPath">
+            <summary>
+            Gets or sets the path to the ffmpeg binary. Leave empty to use the one on PATH.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.VideoFormat">
+            <summary>
+            Gets or sets the yt-dlp format string for video quality selection.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.PreferredContainer">
+            <summary>
+            Gets or sets the preferred output container: mp4, mkv, or webm.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.MaxConcurrentDownloads">
+            <summary>
+            Gets or sets the maximum number of simultaneous downloads.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.OrganiseByChannel">
+            <summary>
+            Gets or sets a value indicating whether to organise videos into channel subfolders.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.DownloadSubtitles">
+            <summary>
+            Gets or sets a value indicating whether to download subtitles.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.SubtitleLanguages">
+            <summary>
+            Gets or sets the subtitle language codes (comma-separated, e.g. "en,de").
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.TriggerLibraryScanAfterDownload">
+            <summary>
+            Gets or sets a value indicating whether to trigger a Jellyfin library scan after downloads complete.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.EnableScheduledDownloads">
+            <summary>
+            Gets or sets a value indicating whether scheduled playlist downloads are enabled.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.ScheduledEntries">
+            <summary>
+            Gets or sets the list of scheduled playlist/channel entries, each with its own optional download path.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.PlaylistMaxAgeDays">
+            <summary>
+            Gets or sets the maximum age in days for playlist items (0 = unlimited).
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.WriteNfoFiles">
+            <summary>
+            Gets or sets a value indicating whether to write .nfo metadata files.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.DownloadThumbnails">
+            <summary>
+            Gets or sets a value indicating whether to download video thumbnails.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.DeleteWatchedScheduledVideos">
+            <summary>
+            Gets or sets a value indicating whether watched videos from scheduled downloads are automatically deleted.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.DefaultAudioLanguage">
+            <summary>
+            Gets or sets the default audio language tag to embed in downloaded files (e.g. "deu", "eng", "fra").
+            Leave empty to not set a language tag.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Helpers.DateParser">
+            <summary>
+            Utility for parsing yt-dlp date strings.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Helpers.DateParser.ParseYtDate(System.String)">
+            <summary>
+            Parses a yt-dlp upload date string in <c>YYYYMMDD</c> format into a nullable <see cref="T:System.DateTime"/>.
+            Returns <c>null</c> if the input is null, empty, or cannot be parsed.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Helpers.PathSanitizer">
+            <summary>
+            Utility for sanitizing strings to be safe for use as filesystem path segments.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Helpers.PathSanitizer.Sanitize(System.String)">
+            <summary>
+            Replaces characters that are illegal on Windows and Linux filesystems with underscores
+            and trims the result to a safe length.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Models.DownloadJob">
+            <summary>
+            Represents a single download job in the queue.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.Id">
+            <summary>Gets the unique identifier of this job.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.Url">
+            <summary>Gets or sets the YouTube URL (video or playlist).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.IsPlaylist">
+            <summary>Gets or sets a value indicating whether this URL points to a playlist.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.Status">
+            <summary>Gets or sets the current job status.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.ProgressPercent">
+            <summary>Gets or sets the download progress (0–100).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.CurrentFile">
+            <summary>Gets or sets the name of the file currently being downloaded.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.ErrorMessage">
+            <summary>Gets or sets the error message if the job failed.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.CreatedAt">
+            <summary>Gets the time this job was created.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.StartedAt">
+            <summary>Gets or sets the time this job started processing (left the queue).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.CompletedAt">
+            <summary>Gets or sets the time this job completed (or failed).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.Metadata">
+            <summary>Gets or sets the fetched video metadata.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.IsScheduled">
+            <summary>Gets or sets a value indicating whether this job was started by the scheduled task.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.DownloadedFilePath">
+            <summary>Gets or sets the full path to the downloaded video file (set after download completes).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.OverrideDownloadPath">
+            <summary>Gets or sets an optional download directory override. Overrides the global DownloadPath for this job.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.MaxAgeDays">
+            <summary>Gets or sets the maximum video age in days for playlist downloads (0 = use global/unlimited).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.DownloadJob.DeleteWatched">
+            <summary>Gets or sets a value indicating whether watched files should be deleted for this job.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Models.DownloadJobStatus">
+            <summary>
+            Represents the current state of a download job.
+            </summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.JellyTube.Models.DownloadJobStatus.Queued">
+            <summary>Job is waiting in the queue.</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.JellyTube.Models.DownloadJobStatus.FetchingMetadata">
+            <summary>Fetching video metadata from YouTube.</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.JellyTube.Models.DownloadJobStatus.Downloading">
+            <summary>Actively downloading the video file.</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.JellyTube.Models.DownloadJobStatus.WritingMetadata">
+            <summary>Writing NFO and thumbnail files.</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.JellyTube.Models.DownloadJobStatus.Completed">
+            <summary>Download and metadata writing completed successfully.</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.JellyTube.Models.DownloadJobStatus.Failed">
+            <summary>Download failed due to an error.</summary>
+        </member>
+        <member name="F:Jellyfin.Plugin.JellyTube.Models.DownloadJobStatus.Cancelled">
+            <summary>Download was cancelled by the user.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Models.ScheduledPlaylistEntry">
+            <summary>
+            A single scheduled playlist/channel URL with an optional custom download path.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.ScheduledPlaylistEntry.Url">
+            <summary>Gets or sets the playlist or channel URL.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.ScheduledPlaylistEntry.DownloadPath">
+            <summary>Gets or sets the download path override. Empty means use the global DownloadPath.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.ScheduledPlaylistEntry.MaxAgeDays">
+            <summary>Gets or sets the maximum video age in days (0 = unlimited, falls back to global PlaylistMaxAgeDays).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.ScheduledPlaylistEntry.DeleteWatched">
+            <summary>Gets or sets a value indicating whether watched videos from this entry are automatically deleted.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Models.VideoMetadata">
+            <summary>
+            Internal representation of YouTube video metadata, decoupled from YoutubeDLSharp types.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.VideoId">
+            <summary>Gets or sets the YouTube video ID (e.g. "dQw4w9WgXcQ").</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.Title">
+            <summary>Gets or sets the video title.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.Description">
+            <summary>Gets or sets the video description.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.ChannelName">
+            <summary>Gets or sets the channel/uploader name.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.ChannelId">
+            <summary>Gets or sets the channel ID.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.UploaderUrl">
+            <summary>Gets or sets the uploader URL.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.UploadDate">
+            <summary>Gets or sets the upload date.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.DurationSeconds">
+            <summary>Gets or sets the duration in seconds.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.ViewCount">
+            <summary>Gets or sets the view count.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.LikeCount">
+            <summary>Gets or sets the like count.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.ThumbnailUrl">
+            <summary>Gets or sets the thumbnail URL.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.WebpageUrl">
+            <summary>Gets or sets the YouTube watch URL.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.Tags">
+            <summary>Gets or sets the video tags.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.Categories">
+            <summary>Gets or sets the video categories.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.PlaylistTitle">
+            <summary>Gets or sets the playlist title, if the video is part of a playlist.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Models.VideoMetadata.PlaylistIndex">
+            <summary>Gets or sets the index within a playlist.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Plugin">
+            <summary>
+            The main plugin class.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Plugin.Instance">
+            <summary>
+            Gets the singleton instance of this plugin.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Plugin.#ctor(MediaBrowser.Common.Configuration.IApplicationPaths,MediaBrowser.Model.Serialization.IXmlSerializer)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.Plugin"/> class.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Plugin.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Plugin.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Plugin.Description">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Plugin.GetPages">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.ScheduledTasks.DownloadQueueTask">
+            <summary>
+            Jellyfin scheduled task that processes the download queue.
+            Visible in the Jellyfin admin panel under Scheduled Tasks → YouTube Downloader.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.ScheduledTasks.DownloadQueueTask.#ctor(Jellyfin.Plugin.JellyTube.Services.DownloadQueueService,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTube.ScheduledTasks.DownloadQueueTask})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.ScheduledTasks.DownloadQueueTask"/> class.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.ScheduledTasks.DownloadQueueTask.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.ScheduledTasks.DownloadQueueTask.Key">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.ScheduledTasks.DownloadQueueTask.Description">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.ScheduledTasks.DownloadQueueTask.Category">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.ScheduledTasks.DownloadQueueTask.GetDefaultTriggers">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.ScheduledTasks.DownloadQueueTask.ExecuteAsync(System.IProgress{System.Double},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.ScheduledTasks.UpdateYtDlpTask">
+            <summary>
+            Jellyfin scheduled task that downloads the latest yt-dlp binary.
+            Runs weekly by default.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.ScheduledTasks.UpdateYtDlpTask.#ctor(Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTube.ScheduledTasks.UpdateYtDlpTask})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.ScheduledTasks.UpdateYtDlpTask"/> class.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.ScheduledTasks.UpdateYtDlpTask.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.ScheduledTasks.UpdateYtDlpTask.Key">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.ScheduledTasks.UpdateYtDlpTask.Description">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.ScheduledTasks.UpdateYtDlpTask.Category">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.ScheduledTasks.UpdateYtDlpTask.GetDefaultTriggers">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.ScheduledTasks.UpdateYtDlpTask.ExecuteAsync(System.IProgress{System.Double},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.ServiceRegistrator">
+            <summary>
+            Registers plugin services with Jellyfin's dependency injection container.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.ServiceRegistrator.RegisterServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,MediaBrowser.Controller.IServerApplicationHost)">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService">
+            <summary>
+            Manages the yt-dlp download archive file.
+            Video IDs written here are skipped by yt-dlp on future scheduled downloads.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService.#ctor(MediaBrowser.Common.Configuration.IApplicationPaths,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService"/> class.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService.ArchivePath">
+            <summary>Gets the path to the archive file passed to yt-dlp via --download-archive.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService.Contains(System.String)">
+            <summary>Returns true if the given YouTube video ID is already in the archive.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService.Add(System.String)">
+            <summary>
+            Adds a YouTube video ID to the archive so yt-dlp will skip it in future downloads.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService.Clear">
+            <summary>
+            Clears the archive file and the in-memory set so all videos can be re-downloaded.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Services.DownloadQueueService">
+            <summary>
+            Thread-safe in-memory queue that manages download jobs.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Services.DownloadQueueService.Reader">
+            <summary>
+            Gets the channel reader used by worker tasks to receive job IDs.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadQueueService.Enqueue(System.String,System.Boolean,System.Boolean,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Enqueues a new download job and returns it.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadQueueService.GetJob(System.Guid)">
+            <summary>
+            Returns a job by its ID, or <c>null</c> if not found.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadQueueService.GetAllJobs">
+            <summary>
+            Returns all jobs ordered by creation time (newest first).
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadQueueService.Cancel(System.Guid)">
+            <summary>
+            Marks a queued or downloading job as cancelled.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadQueueService.CancelAllActive">
+            <summary>
+            Marks all currently active jobs (not yet completed/failed/cancelled) as cancelled.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadQueueService.ClearFinished">
+            <summary>
+            Removes all completed, failed, and cancelled jobs from the in-memory list immediately.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadQueueService.PruneOldJobs(System.TimeSpan)">
+            <summary>
+            Removes completed, failed, or cancelled jobs older than the given age from the in-memory list.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Services.DownloadWorkerService">
+            <summary>
+            Background service that processes download jobs immediately when they are enqueued.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadWorkerService.#ctor(Jellyfin.Plugin.JellyTube.Services.DownloadQueueService,Jellyfin.Plugin.JellyTube.Services.YtDlpService,Jellyfin.Plugin.JellyTube.Services.NfoWriterService,Jellyfin.Plugin.JellyTube.Services.ThumbnailService,Jellyfin.Plugin.JellyTube.Services.LibraryOrganizationService,Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService,MediaBrowser.Controller.Library.ILibraryManager,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTube.Services.DownloadWorkerService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.Services.DownloadWorkerService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadWorkerService.StartAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.DownloadWorkerService.ExecuteAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Services.LibraryOrganizationService">
+            <summary>
+            Determines the on-disk folder layout for downloaded videos.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.LibraryOrganizationService.GetVideoDirectory(Jellyfin.Plugin.JellyTube.Models.VideoMetadata,System.String)">
+            <summary>
+            Returns the directory path where a video should be saved.
+            </summary>
+            <param name="meta">Video metadata.</param>
+            <param name="overrideBasePath">Optional base path override. Falls back to the global DownloadPath when null or empty.</param>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.LibraryOrganizationService.GetNfoPath(System.String)">
+            <summary>
+            Returns the .nfo file path that corresponds to a given video file path.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.LibraryOrganizationService.GetThumbnailPath(System.String,System.String)">
+            <summary>
+            Returns the thumbnail path that corresponds to a given video file path.
+            Jellyfin picks up <c>{name}-thumb.jpg</c> as an episode/item thumbnail.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Services.NfoWriterService">
+            <summary>
+            Writes Kodi/Jellyfin-compatible <c>.nfo</c> metadata files for downloaded videos.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.NfoWriterService.#ctor(Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTube.Services.NfoWriterService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.Services.NfoWriterService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.NfoWriterService.WriteNfoAsync(Jellyfin.Plugin.JellyTube.Models.VideoMetadata,System.String)">
+            <summary>
+            Writes an NFO file to <paramref name="nfoPath"/> using the provided <paramref name="meta"/>.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Services.ThumbnailService">
+            <summary>
+            Downloads video thumbnails and channel poster images to disk.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.ThumbnailService.#ctor(System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTube.Services.ThumbnailService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.Services.ThumbnailService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.ThumbnailService.DownloadThumbnailAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Downloads an image from <paramref name="url"/> and saves it to <paramref name="destPath"/>.
+            Failures are logged as warnings and do not throw.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.ThumbnailService.EnsureChannelPosterAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Downloads <paramref name="thumbnailUrl"/> as <c>poster.jpg</c> inside <paramref name="channelDir"/>
+            only if no poster already exists.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService">
+            <summary>
+            Listens for Jellyfin playback events and deletes watched videos
+            that originated from scheduled downloads, then adds them to the
+            download archive so they are not re-downloaded.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService.#ctor(Jellyfin.Plugin.JellyTube.Services.DownloadQueueService,Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService,MediaBrowser.Controller.Library.IUserDataManager,MediaBrowser.Controller.Library.ILibraryManager,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService.StartAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService.StopAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTube.Services.YtDlpService">
+            <summary>
+            Wraps YoutubeDLSharp to fetch metadata and download videos via yt-dlp.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.YtDlpService.#ctor(Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTube.Services.YtDlpService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.Services.YtDlpService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.YtDlpService.FetchMetadataAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Fetches video metadata without downloading the video.
+            Returns <c>null</c> if the fetch fails.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.YtDlpService.DownloadVideoAsync(System.String,System.String,System.IProgress{YoutubeDLSharp.DownloadProgress},System.Threading.CancellationToken,System.String)">
+            <summary>
+            Downloads a single video to the specified output directory.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.YtDlpService.DownloadPlaylistAsync(System.String,System.String,System.IProgress{YoutubeDLSharp.DownloadProgress},System.Threading.CancellationToken,System.String,System.Int32)">
+            <summary>
+            Downloads all videos in a playlist to the specified output directory.
+            </summary>
+        </member>
+    </members>
+</doc>

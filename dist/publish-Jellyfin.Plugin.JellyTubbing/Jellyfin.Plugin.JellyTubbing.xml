@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jellyfin.Plugin.JellyTubbing</name>
+    </assembly>
+    <members>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController">
+            <summary>
+            REST API endpoints for the JellyTubbing plugin.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.#ctor(Jellyfin.Plugin.JellyTubbing.Services.InvidiousService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.GetUiScript">
+            <summary>
+            Serves the embedded configuration page JavaScript.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.TestInvidious(System.Threading.CancellationToken)">
+            <summary>
+            Tests whether the configured Invidious instance is reachable.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel">
+            <summary>
+            Jellyfin channel that streams YouTube videos via Invidious (with yt-dlp fallback).
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.#ctor(Jellyfin.Plugin.JellyTubbing.Services.InvidiousService,Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel"/> class.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.Description">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.DataVersion">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.HomePageUrl">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.ParentalRating">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.GetChannelFeatures">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.IsEnabledFor(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.GetSupportedChannelImages">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.GetChannelImage(MediaBrowser.Model.Entities.ImageType,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.GetChannelItems(MediaBrowser.Controller.Channels.InternalChannelItemQuery,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.GetChannelItemMediaInfo(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration">
+            <summary>
+            Configuration for JellyTubbing plugin.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.InvidiousInstanceUrl">
+            <summary>Gets or sets the Invidious instance base URL (e.g. https://invidious.example.com).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.YtDlpBinaryPath">
+            <summary>Gets or sets the optional path to the yt-dlp binary for fallback stream resolution.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.PreferredQuality">
+            <summary>Gets or sets the preferred stream quality (360p, 480p, 720p, 1080p).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.TrendingRegion">
+            <summary>Gets or sets the ISO 3166-1 alpha-2 region code for trending videos (e.g. DE, US).</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.InvidiousVideoItem">
+            <summary>A video item returned by Invidious search or trending endpoints.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.InvidiousThumbnail">
+            <summary>A thumbnail entry from Invidious.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.InvidiousVideoDetail">
+            <summary>Detailed video info including progressive stream URLs.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.InvidiousFormatStream">
+            <summary>A progressive (combined video+audio) stream from Invidious.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Plugin">
+            <summary>
+            JellyTubbing plugin – stream YouTube videos directly in Jellyfin via Invidious.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Plugin.Instance">
+            <summary>Gets the singleton instance of this plugin.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Plugin.#ctor(MediaBrowser.Common.Configuration.IApplicationPaths,MediaBrowser.Model.Serialization.IXmlSerializer)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Plugin"/> class.
+            </summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Plugin.Name">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Plugin.Id">
+            <inheritdoc />
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Plugin.Description">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Plugin.GetPages">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.ServiceRegistrator">
+            <summary>
+            Registers JellyTubbing services with Jellyfin's DI container.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.ServiceRegistrator.RegisterServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,MediaBrowser.Controller.IServerApplicationHost)">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService">
+            <summary>
+            Communicates with an Invidious instance to search videos, fetch trending and resolve stream URLs.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService.#ctor(System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTubbing.Services.InvidiousService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService.IsReachableAsync(System.Threading.CancellationToken)">
+            <summary>Checks whether the configured Invidious instance is reachable.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService.SearchAsync(System.String,System.Threading.CancellationToken)">
+            <summary>Searches YouTube via Invidious and returns channel items.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService.GetTrendingAsync(System.Threading.CancellationToken)">
+            <summary>Returns trending videos for the configured region.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService.GetBestStreamUrlAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Fetches the best progressive MP4 stream URL for a video from Invidious.
+            Returns <c>null</c> if unavailable.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService">
+            <summary>
+            Resolves a YouTube video ID to a direct stream URL.
+            Primary: Invidious progressive stream. Fallback: yt-dlp -g.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService.#ctor(Jellyfin.Plugin.JellyTubbing.Services.InvidiousService,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService.ResolveAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Returns one or more <see cref="T:MediaBrowser.Model.Dto.MediaSourceInfo"/> for the given YouTube video ID.
+            </summary>
+        </member>
+    </members>
+</doc>
