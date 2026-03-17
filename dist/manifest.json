@@ -5,8 +5,8 @@
                          {
                              "changelog":  "Initiale Version",
                              "version":  "1.0.0.0",
-                             "checksum":  "09b962eb55f804588aef9ec03cc1cdd0",
-                             "timestamp":  "2026-03-17T20:09:57Z",
+                             "checksum":  "1faa9897b1e92419fefbc1ae4bf3ba00",
+                             "timestamp":  "2026-03-17T20:51:05Z",
                              "targetAbi":  "10.9.0.0",
                              "sourceUrl":  "https://raw.githubusercontent.com/b00namd/JellyTube/master/dist/Jellyfin.Plugin.JellyTube_1.0.0.0.zip"
                          }
