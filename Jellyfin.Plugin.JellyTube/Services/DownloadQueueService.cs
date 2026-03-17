@@ -24,14 +24,16 @@ public class DownloadQueueService
     /// <summary>
     /// Enqueues a new download job and returns it.
     /// </summary>
-    public DownloadJob Enqueue(string url, bool isPlaylist = false, bool isScheduled = false, string? overrideDownloadPath = null)
+    public DownloadJob Enqueue(string url, bool isPlaylist = false, bool isScheduled = false, string? overrideDownloadPath = null, int maxAgeDays = 0, bool deleteWatched = false)
     {
         var job = new DownloadJob
         {
             Url = url,
             IsPlaylist = isPlaylist,
             IsScheduled = isScheduled,
-            OverrideDownloadPath = string.IsNullOrWhiteSpace(overrideDownloadPath) ? null : overrideDownloadPath
+            OverrideDownloadPath = string.IsNullOrWhiteSpace(overrideDownloadPath) ? null : overrideDownloadPath,
+            MaxAgeDays = maxAgeDays,
+            DeleteWatched = deleteWatched
         };
         _jobs[job.Id] = job;
         _workChannel.Writer.TryWrite(job.Id);
@@ -56,10 +58,54 @@ public class DownloadQueueService
     public void Cancel(Guid id)
     {
         if (_jobs.TryGetValue(id, out var job)
-            && job.Status is DownloadJobStatus.Queued or DownloadJobStatus.FetchingMetadata)
+            && job.Status is DownloadJobStatus.Queued
+                          or DownloadJobStatus.FetchingMetadata
+                          or DownloadJobStatus.Downloading
+                          or DownloadJobStatus.WritingMetadata)
         {
             job.Status = DownloadJobStatus.Cancelled;
+            job.CompletedAt = DateTime.UtcNow;
         }
+    }
+
+    /// <summary>
+    /// Marks all currently active jobs (not yet completed/failed/cancelled) as cancelled.
+    /// </summary>
+    public int CancelAllActive()
+    {
+        int count = 0;
+        foreach (var job in _jobs.Values)
+        {
+            if (job.Status is DownloadJobStatus.Queued
+                           or DownloadJobStatus.FetchingMetadata
+                           or DownloadJobStatus.Downloading
+                           or DownloadJobStatus.WritingMetadata)
+            {
+                job.Status = DownloadJobStatus.Cancelled;
+                job.CompletedAt = DateTime.UtcNow;
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /// <summary>
+    /// Removes all completed, failed, and cancelled jobs from the in-memory list immediately.
+    /// </summary>
+    public int ClearFinished()
+    {
+        int count = 0;
+        foreach (var kvp in _jobs)
+        {
+            if (kvp.Value.Status is DownloadJobStatus.Completed
+                                 or DownloadJobStatus.Failed
+                                 or DownloadJobStatus.Cancelled)
+            {
+                _jobs.TryRemove(kvp.Key, out _);
+                count++;
+            }
+        }
+        return count;
     }
 
     /// <summary>

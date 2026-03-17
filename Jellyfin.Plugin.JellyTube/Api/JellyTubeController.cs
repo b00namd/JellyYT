@@ -26,14 +26,16 @@ public class JellyTubeController : ControllerBase
 {
     private readonly DownloadQueueService _queue;
     private readonly YtDlpService _ytDlp;
+    private readonly DownloadArchiveService _archive;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JellyTubeController"/> class.
     /// </summary>
-    public JellyTubeController(DownloadQueueService queue, YtDlpService ytDlp)
+    public JellyTubeController(DownloadQueueService queue, YtDlpService ytDlp, DownloadArchiveService archive)
     {
         _queue = queue;
         _ytDlp = ytDlp;
+        _archive = archive;
     }
 
     /// <summary>
@@ -198,6 +200,39 @@ public class JellyTubeController : ControllerBase
         {
             return (false, null, ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Removes all completed, failed, and cancelled jobs from the list.
+    /// </summary>
+    [HttpDelete("jobs/finished")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public ActionResult<int> ClearFinishedJobs()
+    {
+        var count = _queue.ClearFinished();
+        return Ok(count);
+    }
+
+    /// <summary>
+    /// Cancels all active (queued or in-progress) jobs.
+    /// </summary>
+    [HttpDelete("jobs")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public ActionResult<int> CancelAllJobs()
+    {
+        var count = _queue.CancelAllActive();
+        return Ok(count);
+    }
+
+    /// <summary>
+    /// Clears the download archive so all scheduled playlist videos can be re-downloaded.
+    /// </summary>
+    [HttpDelete("archive")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public IActionResult ClearArchive()
+    {
+        _archive.Clear();
+        return NoContent();
     }
 
     /// <summary>

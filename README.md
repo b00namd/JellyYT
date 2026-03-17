@@ -11,11 +11,18 @@ Ein Jellyfin-Plugin zum Herunterladen von YouTube-Videos und Playlists direkt in
 - NFO-Dateien und Vorschaubilder automatisch generieren
 - Nach Kanal in Unterordner sortieren
 - Untertitel herunterladen (mehrere Sprachen)
-- Download-Warteschlange mit Fortschrittsanzeige und sofortigem Start
+- Download-Warteschlange mit Fortschrittsanzeige, Laufzeitanzeige und sofortigem Start
+- Aktive und wartende Jobs einzeln abbrechen
+- Abgeschlossene Jobs per Knopfdruck leeren
 - Jellyfin-Bibliothek nach Download automatisch aktualisieren
 - Geplante Playlist-Downloads per Scheduled Task
+- Pro geplantem Download: eigenes Maximalalter und „Gesehen löschen"-Option
+- Archiv für geplante Downloads – bereits heruntergeladene Videos werden übersprungen
+- Archiv zurücksetzen direkt im Plugin möglich
+- Smarter Kanal-Scan: stoppt beim ersten bereits archivierten oder zu alten Video (`--break-on-existing`, `--break-on-reject`)
+- Standard-Audiosprache konfigurierbar (ISO 639-2, z. B. `deu`) – wird als Sprachmetadaten in die Audiodatei eingebettet
+- Verwaiste yt-dlp-Prozesse werden beim Neustart automatisch beendet
 - yt-dlp und ffmpeg Verfügbarkeitscheck in den Einstellungen
-- Gesehene Videos aus geplanten Downloads automatisch löschen (kein erneuter Download)
 - Vollständig auf Deutsch
 
 ---
@@ -67,7 +74,9 @@ yt-dlp und ffmpeg können entweder im Systempfad (PATH) liegen oder der vollstä
 | NFO-Dateien schreiben | Metadaten für Jellyfin |
 | Vorschaubilder herunterladen | Thumbnails speichern |
 | Bibliothek aktualisieren | Scan nach Download |
-| Geplante Downloads | Playlists automatisch prüfen |
+| Standard-Audiosprache | ISO 639-2 Sprachcode (z. B. `deu`), der in die Audiometadaten eingebettet wird |
+| Geplante Downloads | Playlists automatisch prüfen, inkl. Maximalalter und „Gesehen löschen" pro Eintrag |
+| Max. Videoalter (Playlist) | Globales Limit: nur Videos der letzten N Tage herunterladen |
 | Gesehene Videos löschen | Nur für geplante Downloads: Datei nach dem Schauen löschen, kein erneuter Download |
 
 ---

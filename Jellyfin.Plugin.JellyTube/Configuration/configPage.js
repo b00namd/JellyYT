@@ -59,19 +59,25 @@
         var container = document.getElementById('yt-scheduled-entries');
         container.innerHTML = '';
         (entries || []).forEach(function (entry) {
-            addEntryRow(entry.Url || '', entry.DownloadPath || '');
+            addEntryRow(entry.Url || '', entry.DownloadPath || '', entry.MaxAgeDays || 0, !!entry.DeleteWatched);
         });
     }
 
-    function addEntryRow(url, path) {
+    function addEntryRow(url, path, maxAgeDays, deleteWatched) {
         var container = document.getElementById('yt-scheduled-entries');
         var row = document.createElement('div');
         row.className = 'yt-entry-row';
         row.innerHTML =
-            '<input type="text" class="yt-entry-url emby-input" placeholder="https://..." value="' + escHtml(url) + '" style="flex:2;background:#1c1c1c;color:#fff;border:1px solid #444;border-radius:4px;padding:0.4em 0.6em;" />' +
-            '<input type="text" class="yt-entry-path emby-input" placeholder="Verzeichnis (leer = Basis)" value="' + escHtml(path) + '" style="flex:2;background:#1c1c1c;color:#fff;border:1px solid #444;border-radius:4px;padding:0.4em 0.6em;" />' +
-            '<button type="button" class="yt-entry-browse raised emby-button" style="padding:0.4em 0.8em;">&#128193;</button>' +
-            '<button type="button" class="yt-entry-remove raised emby-button" style="padding:0.4em 0.8em;background:#5a1a1a;">&#10005;</button>';
+            '<div class="yt-entry-row-main">' +
+                '<input type="text" class="yt-entry-url emby-input" placeholder="https://..." value="' + escHtml(url) + '" style="flex:2;background:#1c1c1c;color:#fff;border:1px solid #444;border-radius:4px;padding:0.4em 0.6em;" />' +
+                '<input type="text" class="yt-entry-path emby-input" placeholder="Verzeichnis (leer = Basis)" value="' + escHtml(path) + '" style="flex:2;background:#1c1c1c;color:#fff;border:1px solid #444;border-radius:4px;padding:0.4em 0.6em;" />' +
+                '<button type="button" class="yt-entry-browse raised emby-button" style="padding:0.4em 0.8em;">&#128193;</button>' +
+                '<button type="button" class="yt-entry-remove raised emby-button" style="padding:0.4em 0.8em;background:#5a1a1a;">&#10005;</button>' +
+            '</div>' +
+            '<div class="yt-entry-row-opts">' +
+                '<label class="yt-entry-maxage-label">Max. Videoalter (Tage, 0=unbegrenzt): <input type="number" class="yt-entry-maxage" min="0" value="' + (maxAgeDays || 0) + '" /></label>' +
+                '<label class="yt-entry-delwatched-label"><input type="checkbox" class="yt-entry-delwatched"' + (deleteWatched ? ' checked' : '') + ' /> Gesehene Videos löschen</label>' +
+            '</div>';
 
         var pathInput = row.querySelector('.yt-entry-path');
         row.querySelector('.yt-entry-browse').addEventListener('click', function () {
@@ -92,7 +98,9 @@
             if (url) {
                 result.push({
                     Url: url,
-                    DownloadPath: row.querySelector('.yt-entry-path').value.trim()
+                    DownloadPath: row.querySelector('.yt-entry-path').value.trim(),
+                    MaxAgeDays: parseInt(row.querySelector('.yt-entry-maxage').value) || 0,
+                    DeleteWatched: row.querySelector('.yt-entry-delwatched').checked
                 });
             }
         });
@@ -126,12 +134,11 @@
             document.getElementById('OrganiseByChannel').checked        = !!config.OrganiseByChannel;
             document.getElementById('DownloadSubtitles').checked        = !!config.DownloadSubtitles;
             document.getElementById('SubtitleLanguages').value          = config.SubtitleLanguages || '';
+            document.getElementById('DefaultAudioLanguage').value       = config.DefaultAudioLanguage || '';
             document.getElementById('WriteNfoFiles').checked            = !!config.WriteNfoFiles;
             document.getElementById('DownloadThumbnails').checked       = !!config.DownloadThumbnails;
             document.getElementById('TriggerLibraryScanAfterDownload').checked = !!config.TriggerLibraryScanAfterDownload;
             document.getElementById('EnableScheduledDownloads').checked = !!config.EnableScheduledDownloads;
-            document.getElementById('PlaylistMaxAgeDays').value         = config.PlaylistMaxAgeDays || 30;
-            document.getElementById('DeleteWatchedScheduledVideos').checked = !!config.DeleteWatchedScheduledVideos;
 
             renderScheduledEntries(config.ScheduledEntries || []);
         });
@@ -151,13 +158,12 @@
             config.OrganiseByChannel          = document.getElementById('OrganiseByChannel').checked;
             config.DownloadSubtitles          = document.getElementById('DownloadSubtitles').checked;
             config.SubtitleLanguages          = document.getElementById('SubtitleLanguages').value;
+            config.DefaultAudioLanguage       = document.getElementById('DefaultAudioLanguage').value;
             config.WriteNfoFiles              = document.getElementById('WriteNfoFiles').checked;
             config.DownloadThumbnails         = document.getElementById('DownloadThumbnails').checked;
             config.TriggerLibraryScanAfterDownload = document.getElementById('TriggerLibraryScanAfterDownload').checked;
             config.EnableScheduledDownloads   = document.getElementById('EnableScheduledDownloads').checked;
             config.ScheduledEntries           = collectScheduledEntries();
-            config.PlaylistMaxAgeDays         = parseInt(document.getElementById('PlaylistMaxAgeDays').value) || 30;
-            config.DeleteWatchedScheduledVideos = document.getElementById('DeleteWatchedScheduledVideos').checked;
 
             ApiClient.updatePluginConfiguration(PLUGIN_ID, config).then(function () {
                 showToast('Einstellungen gespeichert.');
@@ -327,7 +333,7 @@
 
         if (!jobs.length) {
             var row = document.createElement('tr');
-            row.innerHTML = '<td colspan="5" style="text-align:center;color:#888;">Keine Eintr\u00e4ge vorhanden.</td>';
+            row.innerHTML = '<td colspan="6" style="text-align:center;color:#888;">Keine Eintr\u00e4ge vorhanden.</td>';
             tbody.appendChild(row);
             return;
         }
@@ -343,8 +349,16 @@
             }
 
             var actionHtml = '';
-            if (job.Status === 'Queued') {
+            var isActive = ['Queued','FetchingMetadata','Downloading','WritingMetadata'].indexOf(job.Status) >= 0;
+            if (isActive) {
                 actionHtml = '<button is="emby-button" data-id="' + job.Id + '" class="yt-cancel-btn raised" style="font-size:0.8em;padding:2px 8px;">Abbrechen</button>';
+            }
+
+            var runtimeHtml = '';
+            if (job.StartedAt) {
+                var endMs = job.CompletedAt ? new Date(job.CompletedAt).getTime() : Date.now();
+                var elapsedSecs = Math.floor((endMs - new Date(job.StartedAt).getTime()) / 1000);
+                runtimeHtml = fmtDuration(elapsedSecs);
             }
 
             var row = document.createElement('tr');
@@ -352,6 +366,7 @@
                 '<td title="' + escHtml(job.Url) + '">' + escHtml(title.substring(0, 60)) + (title.length > 60 ? '\u2026' : '') + '</td>' +
                 '<td><span class="yt-status-badge yt-status-' + job.Status + '">' + job.Status + '</span></td>' +
                 '<td>' + progressHtml + '</td>' +
+                '<td>' + runtimeHtml + '</td>' +
                 '<td>' + fmtDate(job.CreatedAt) + '</td>' +
                 '<td>' + actionHtml + '</td>';
             tbody.appendChild(row);
@@ -390,7 +405,7 @@
                     ? '<span class="yt-tool-ok">&#10003;</span> yt-dlp ' + escHtml(t.YtDlpVersion || '')
                     : '<span class="yt-tool-err">&#10007;</span> yt-dlp nicht gefunden' + (t.YtDlpError ? ' (' + escHtml(t.YtDlpError) + ')' : '');
                 document.getElementById('yt-tool-ffmpeg').innerHTML = t.FfmpegAvailable
-                    ? '<span class="yt-tool-ok">&#10003;</span> ffmpeg ' + escHtml((t.FfmpegVersion || '').split(' ').slice(0, 3).join(' '))
+                    ? '<span class="yt-tool-ok">&#10003;</span> ' + escHtml((t.FfmpegVersion || '').split(' ').slice(0, 3).join(' '))
                     : '<span class="yt-tool-err">&#10007;</span> ffmpeg nicht gefunden' + (t.FfmpegError ? ' (' + escHtml(t.FfmpegError) + ')' : '');
             })
             .catch(function (err) {
@@ -439,13 +454,45 @@
 
         // Add scheduled entry row
         document.getElementById('yt-add-entry-btn').addEventListener('click', function () {
-            addEntryRow('', '');
+            addEntryRow('', '', 0, false);
+        });
+
+        document.getElementById('yt-clear-archive-btn').addEventListener('click', function () {
+            if (!confirm('Download-Archiv wirklich zurücksetzen? Alle geplanten Playlist-Videos werden beim nächsten Task erneut heruntergeladen.'))
+                return;
+            fetch(API_BASE + '/archive', { method: 'DELETE', headers: apiHeaders() })
+                .then(function (r) {
+                    if (r.status === 204) showToast('Archiv wurde zurückgesetzt.');
+                    else showToast('Fehler beim Zurücksetzen: ' + r.statusText);
+                })
+                .catch(function (err) { showToast('Fehler: ' + err); });
         });
 
         document.getElementById('yt-save-btn').addEventListener('click', saveConfig);
         document.getElementById('yt-fetch-meta-btn').addEventListener('click', fetchMetadata);
         document.getElementById('yt-download-btn').addEventListener('click', enqueueDownload);
         document.getElementById('yt-refresh-btn').addEventListener('click', refreshJobs);
+
+        document.getElementById('yt-clear-finished-btn').addEventListener('click', function () {
+            fetch(API_BASE + '/jobs/finished', { method: 'DELETE', headers: apiHeaders() })
+                .then(function (r) { return r.ok ? r.json() : Promise.reject(r.statusText); })
+                .then(function (count) {
+                    showToast(count + ' Job(s) entfernt.');
+                    refreshJobs();
+                })
+                .catch(function (err) { showToast('Fehler: ' + err); });
+        });
+
+        document.getElementById('yt-cancel-all-btn').addEventListener('click', function () {
+            if (!confirm('Alle aktiven und wartenden Jobs wirklich abbrechen?')) return;
+            fetch(API_BASE + '/jobs', { method: 'DELETE', headers: apiHeaders() })
+                .then(function (r) { return r.ok ? r.json() : Promise.reject(r.statusText); })
+                .then(function (count) {
+                    showToast(count + ' Job(s) abgebrochen.');
+                    refreshJobs();
+                })
+                .catch(function (err) { showToast('Fehler: ' + err); });
+        });
 
         pollTimer = setInterval(refreshJobs, 5000);
 

@@ -98,11 +98,12 @@ public class YtDlpService
         string outputDir,
         IProgress<DownloadProgress>? progress,
         CancellationToken ct,
-        string? archivePath = null)
+        string? archivePath = null,
+        int maxAgeDays = 0)
     {
         var ytdl = CreateClient(outputDir);
         var config = Plugin.Instance!.Configuration;
-        var opts = BuildSubtitleOptions(playlist: true, archivePath: archivePath);
+        var opts = BuildSubtitleOptions(playlist: true, archivePath: archivePath, maxAgeDays: maxAgeDays);
 
         try
         {
@@ -158,7 +159,7 @@ public class YtDlpService
             _ => DownloadMergeFormat.Mp4
         };
 
-    private static OptionSet BuildSubtitleOptions(bool playlist, string? archivePath = null)
+    private static OptionSet BuildSubtitleOptions(bool playlist, string? archivePath = null, int maxAgeDays = 0)
     {
         var config = Plugin.Instance!.Configuration;
 
@@ -168,20 +169,30 @@ public class YtDlpService
             WriteAutoSubs = config.DownloadSubtitles,
             WriteSubs = config.DownloadSubtitles,
             SubLangs = config.DownloadSubtitles ? config.SubtitleLanguages : null,
-            RestrictFilenames = true,
-            NoPlaylist = !playlist
+            NoPlaylist = !playlist,
+            WriteInfoJson = playlist,  // write per-video .info.json so metadata can be read back for all items
+            IgnoreErrors = playlist    // skip unavailable/deleted videos instead of aborting the whole playlist
         };
 
-        // Limit playlist by date if configured
-        if (playlist && config.PlaylistMaxAgeDays > 0)
+        // Per-entry maxAgeDays takes priority; fall back to global setting
+        var effectiveMaxAge = maxAgeDays > 0 ? maxAgeDays : config.PlaylistMaxAgeDays;
+        if (playlist && effectiveMaxAge > 0)
         {
-            opts.DateAfter = DateTime.UtcNow.AddDays(-config.PlaylistMaxAgeDays);
+            opts.DateAfter = DateTime.UtcNow.AddDays(-effectiveMaxAge);
+            opts.BreakOnReject = true; // stop at first video older than the date limit (channel is newest-first)
+        }
+
+        // Embed audio language tag via ffmpeg post-processor
+        if (!string.IsNullOrWhiteSpace(config.DefaultAudioLanguage))
+        {
+            opts.PostprocessorArgs = $"ffmpeg:-metadata:s:a:0 language={config.DefaultAudioLanguage.Trim()}";
         }
 
         // Use archive file to skip already-downloaded (or deleted) videos
         if (!string.IsNullOrEmpty(archivePath))
         {
             opts.DownloadArchive = archivePath;
+            opts.BreakOnExisting = true; // stop at first archived video (channel is sorted newest-first)
         }
 
         return opts;

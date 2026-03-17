@@ -71,9 +71,9 @@
         .yt-status-Failed      { background: #8a1a1a; color: #fff; }
         .yt-status-Cancelled   { background: #555;    color: #aaa; }
         .yt-tools-bar {
-            display: flex;
+            display: inline-flex;
             gap: 1.5em;
-            padding: 0.6em 1em;
+            padding: 0.5em 1em;
             background: #1a1a1a;
             border: 1px solid #333;
             border-radius: 6px;
@@ -87,13 +87,18 @@
         .yt-input-row { display: flex; gap: 0.5em; align-items: flex-end; }
         .yt-input-row > div { flex: 1; }
         .yt-entry-row {
-            display: flex; gap: 0.5em; align-items: flex-end;
+            display: flex; flex-direction: column; gap: 0.4em;
             margin-bottom: 0.5em; padding: 0.6em; background: #161616;
             border: 1px solid #333; border-radius: 4px;
         }
+        .yt-entry-row-main { display: flex; gap: 0.5em; align-items: flex-end; }
+        .yt-entry-row-opts { display: flex; gap: 1em; align-items: center; flex-wrap: wrap; padding-top: 0.2em; }
         .yt-entry-url { flex: 2; }
         .yt-entry-path { flex: 2; }
         .yt-entry-browse, .yt-entry-remove { flex-shrink: 0; white-space: nowrap; }
+        .yt-entry-maxage-label { display: flex; align-items: center; gap: 0.4em; font-size: 0.85em; color: #ccc; }
+        .yt-entry-maxage { width: 70px; background: #1c1c1c; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 0.3em 0.5em; }
+        .yt-entry-delwatched-label { display: flex; align-items: center; gap: 0.4em; font-size: 0.85em; color: #ccc; cursor: pointer; }
         #yt-dir-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.75); z-index: 9000;
@@ -143,7 +148,7 @@
 
                         <div class="inputContainer">
                             <label class="inputLabel" for="DownloadPath">Download-Pfad</label>
-                            <div class="yt-input-row">
+                            <div class="yt-input-row" style="max-width:500px;">
                                 <div>
                                     <input id="DownloadPath" name="DownloadPath" type="text" is="emby-input"
                                            placeholder="/media/youtube" />
@@ -171,14 +176,14 @@
                         <div class="inputContainer">
                             <label class="inputLabel" for="YtDlpBinaryPath">yt-dlp Programmpfad (optional)</label>
                             <input id="YtDlpBinaryPath" name="YtDlpBinaryPath" type="text" is="emby-input"
-                                   placeholder="z.B. /usr/local/bin/yt-dlp" />
+                                   placeholder="z.B. /usr/local/bin/yt-dlp" style="max-width:500px;" />
                             <div class="fieldDescription">Vollständiger Pfad zur yt-dlp-Binärdatei. Leer lassen, wenn yt-dlp im Systempfad (PATH) verfügbar ist.</div>
                         </div>
 
                         <div class="inputContainer">
                             <label class="inputLabel" for="FfmpegBinaryPath">ffmpeg Programmpfad (optional)</label>
                             <input id="FfmpegBinaryPath" name="FfmpegBinaryPath" type="text" is="emby-input"
-                                   placeholder="z.B. /usr/local/bin/ffmpeg" />
+                                   placeholder="z.B. /usr/local/bin/ffmpeg" style="max-width:500px;" />
                             <div class="fieldDescription">Vollständiger Pfad zur ffmpeg-Binärdatei. Wird zum Zusammenführen von Video und Audio benötigt. Leer lassen, wenn ffmpeg im Systempfad (PATH) verfügbar ist.</div>
                         </div>
 
@@ -203,7 +208,7 @@
 
                         <div class="inputContainer">
                             <label class="inputLabel" for="PreferredContainer">Bevorzugter Container</label>
-                            <select id="PreferredContainer" name="PreferredContainer" is="emby-select">
+                            <select id="PreferredContainer" name="PreferredContainer" is="emby-select" style="max-width:160px;">
                                 <option value="mp4">MP4</option>
                                 <option value="mkv">MKV</option>
                                 <option value="webm">WebM</option>
@@ -213,7 +218,7 @@
                         <div class="inputContainer">
                             <label class="inputLabel" for="MaxConcurrentDownloads">Maximale gleichzeitige Downloads</label>
                             <input id="MaxConcurrentDownloads" name="MaxConcurrentDownloads" type="number"
-                                   is="emby-input" min="1" max="10" />
+                                   is="emby-input" min="1" max="10" style="max-width:80px;" />
                         </div>
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
@@ -234,8 +239,15 @@
                         <div class="inputContainer">
                             <label class="inputLabel" for="SubtitleLanguages">Untertitelsprachen</label>
                             <input id="SubtitleLanguages" name="SubtitleLanguages" type="text" is="emby-input"
-                                   placeholder="en,de" />
+                                   placeholder="en,de" style="max-width:200px;" />
                             <div class="fieldDescription">Kommagetrennte Sprachcodes.</div>
+                        </div>
+
+                        <div class="inputContainer">
+                            <label class="inputLabel" for="DefaultAudioLanguage">Standard-Audiosprache</label>
+                            <input id="DefaultAudioLanguage" name="DefaultAudioLanguage" type="text" is="emby-input"
+                                   placeholder="deu" style="max-width:120px;" />
+                            <div class="fieldDescription">ISO 639-2 Code (z.B. deu, eng, fra). Wird via ffmpeg in die Audiodatei eingebettet, damit Jellyfin die Sprache korrekt anzeigt. Leer lassen = kein Tag.</div>
                         </div>
 
                         <div class="checkboxContainer checkboxContainer-withDescription">
@@ -275,7 +287,7 @@
                         <div class="inputContainer">
                             <label class="inputLabel">Playlist-/Kanal-Einträge</label>
                             <div class="fieldDescription" style="margin-bottom:0.5em;">
-                                Jeder Eintrag hat eine URL und ein optionales Verzeichnis. Leer = Basisverzeichnis wird verwendet.
+                                Jeder Eintrag hat eine URL, ein optionales Verzeichnis, ein maximales Videoalter (Tage, 0 = kein Limit) und die Option, gesehene Videos automatisch zu löschen.
                             </div>
                             <div id="yt-scheduled-entries"></div>
                             <button id="yt-add-entry-btn" is="emby-button" type="button" class="raised" style="margin-top:0.4em;">
@@ -284,18 +296,13 @@
                         </div>
 
                         <div class="inputContainer">
-                            <label class="inputLabel" for="PlaylistMaxAgeDays">Maximales Videoalter (Tage)</label>
-                            <input id="PlaylistMaxAgeDays" name="PlaylistMaxAgeDays" type="number"
-                                   is="emby-input" min="0" />
-                            <div class="fieldDescription">Videos aus Playlists überspringen, die älter als diese Anzahl Tage sind. 0 = kein Limit.</div>
-                        </div>
-
-                        <div class="checkboxContainer checkboxContainer-withDescription">
-                            <label class="emby-checkbox-label">
-                                <input id="DeleteWatchedScheduledVideos" name="DeleteWatchedScheduledVideos" type="checkbox" is="emby-checkbox" />
-                                <span>Gesehene Videos automatisch löschen</span>
-                            </label>
-                            <div class="fieldDescription checkboxFieldDescription">Gilt nur für geplante Downloads. Wird ein Video als gesehen markiert, wird die Datei automatisch gelöscht und das Video nicht erneut heruntergeladen.</div>
+                            <label class="inputLabel">Download-Archiv</label>
+                            <div class="fieldDescription" style="margin-bottom:0.5em;">
+                                Das Archiv speichert, welche Videos bereits heruntergeladen wurden, damit sie nicht erneut geladen werden. Zurücksetzen, um alle Videos der geplanten Playlists erneut herunterzuladen.
+                            </div>
+                            <button id="yt-clear-archive-btn" is="emby-button" type="button" class="raised">
+                                Archiv zurücksetzen
+                            </button>
                         </div>
 
                         <div>
@@ -315,7 +322,7 @@
                     <div class="inputContainer">
                         <label class="inputLabel" for="yt-url-input">YouTube-URL</label>
                         <input id="yt-url-input" type="text" is="emby-input"
-                               placeholder="https://www.youtube.com/watch?v=..." />
+                               placeholder="https://www.youtube.com/watch?v=..." style="max-width:500px;" />
                     </div>
 
                     <div class="checkboxContainer">
@@ -327,7 +334,7 @@
 
                     <div class="inputContainer">
                         <label class="inputLabel" for="yt-dl-path">Zielverzeichnis (optional)</label>
-                        <div class="yt-input-row">
+                        <div class="yt-input-row" style="max-width:500px;">
                             <div>
                                 <input id="yt-dl-path" type="text" is="emby-input"
                                        placeholder="Leer = Basisverzeichnis" />
@@ -340,7 +347,7 @@
 
                     <div style="margin-bottom:1em;">
                         <button id="yt-fetch-meta-btn" is="emby-button" type="button" class="raised">
-                            Metadaten vorschau
+                            Metadaten-Vorschau
                         </button>
                         &nbsp;
                         <button id="yt-download-btn" is="emby-button" type="button" class="raised button-submit">
@@ -369,6 +376,14 @@
                     <button id="yt-refresh-btn" is="emby-button" type="button" class="raised">
                         Aktualisieren
                     </button>
+                    &nbsp;
+                    <button id="yt-cancel-all-btn" is="emby-button" type="button" class="raised" style="background:#5a1a1a;">
+                        Alle aktiven Jobs abbrechen
+                    </button>
+                    &nbsp;
+                    <button id="yt-clear-finished-btn" is="emby-button" type="button" class="raised">
+                        Abgeschlossene leeren
+                    </button>
                     <div style="overflow-x:auto;margin-top:0.8em;">
                         <table id="yt-job-table">
                             <thead>
@@ -376,6 +391,7 @@
                                     <th>Titel / URL</th>
                                     <th>Status</th>
                                     <th>Fortschritt</th>
+                                    <th>Laufzeit</th>
                                     <th>Hinzugefügt</th>
                                     <th>Aktion</th>
                                 </tr>

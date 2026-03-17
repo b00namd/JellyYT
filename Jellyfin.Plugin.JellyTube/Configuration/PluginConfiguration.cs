@@ -88,4 +88,10 @@ public class PluginConfiguration : BasePluginConfiguration
     /// Gets or sets a value indicating whether watched videos from scheduled downloads are automatically deleted.
     /// </summary>
     public bool DeleteWatchedScheduledVideos { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the default audio language tag to embed in downloaded files (e.g. "deu", "eng", "fra").
+    /// Leave empty to not set a language tag.
+    /// </summary>
+    public string DefaultAudioLanguage { get; set; } = string.Empty;
 }
