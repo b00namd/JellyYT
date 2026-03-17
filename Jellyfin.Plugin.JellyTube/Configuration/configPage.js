@@ -333,7 +333,7 @@
 
         if (!jobs.length) {
             var row = document.createElement('tr');
-            row.innerHTML = '<td colspan="5" style="text-align:center;color:#888;">Keine Eintr\u00e4ge vorhanden.</td>';
+            row.innerHTML = '<td colspan="6" style="text-align:center;color:#888;">Keine Eintr\u00e4ge vorhanden.</td>';
             tbody.appendChild(row);
             return;
         }
@@ -354,11 +354,19 @@
                 actionHtml = '<button is="emby-button" data-id="' + job.Id + '" class="yt-cancel-btn raised" style="font-size:0.8em;padding:2px 8px;">Abbrechen</button>';
             }
 
+            var runtimeHtml = '';
+            if (job.StartedAt) {
+                var endMs = job.CompletedAt ? new Date(job.CompletedAt).getTime() : Date.now();
+                var elapsedSecs = Math.floor((endMs - new Date(job.StartedAt).getTime()) / 1000);
+                runtimeHtml = fmtDuration(elapsedSecs);
+            }
+
             var row = document.createElement('tr');
             row.innerHTML =
                 '<td title="' + escHtml(job.Url) + '">' + escHtml(title.substring(0, 60)) + (title.length > 60 ? '\u2026' : '') + '</td>' +
                 '<td><span class="yt-status-badge yt-status-' + job.Status + '">' + job.Status + '</span></td>' +
                 '<td>' + progressHtml + '</td>' +
+                '<td>' + runtimeHtml + '</td>' +
                 '<td>' + fmtDate(job.CreatedAt) + '</td>' +
                 '<td>' + actionHtml + '</td>';
             tbody.appendChild(row);
