@@ -325,29 +325,78 @@
         e.target.value = '';
     });
 
-    document.getElementById('jt-browse-btn').addEventListener('click', function () {
-        if (typeof require !== 'function') {
-            alert('Ordnerbrowser nicht verfuegbar. Bitte Pfad manuell eingeben.');
-            return;
-        }
-        require(['directorybrowser'], function (DirectoryBrowser) {
-            try {
-                var picker = new DirectoryBrowser();
-                picker.show({
-                    callback: function (path) {
-                        if (path) document.getElementById('StrmOutputPath').value = path;
-                    },
-                    includeFiles: false,
-                    header: 'STRM-Ausgabeordner waehlen'
+    // -----------------------------------------------------------------------
+    // Directory browser (uses Jellyfin /Environment API)
+    // -----------------------------------------------------------------------
+
+    function openDirBrowser() {
+        var overlay = document.getElementById('jt-dir-overlay');
+        if (!overlay) return;
+        overlay.style.display = 'flex';
+        loadDir('');
+    }
+
+    function closeDirBrowser() {
+        var overlay = document.getElementById('jt-dir-overlay');
+        if (overlay) overlay.style.display = 'none';
+    }
+
+    function loadDir(path) {
+        var list    = document.getElementById('jt-dir-list');
+        var pathEl  = document.getElementById('jt-dir-path');
+        var headers = { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' };
+
+        list.innerHTML = '<li style="color:#aaa;padding:0.4em 0;">&#8987; Laden...</li>';
+        if (pathEl) pathEl.textContent = path || '/';
+
+        var url = path
+            ? '/Environment/DirectoryContents?path=' + encodeURIComponent(path) + '&includeFiles=false&includeDirectories=true'
+            : '/Environment/Drives';
+
+        fetch(url, { headers: headers })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (data) {
+                list.innerHTML = '';
+                var items = Array.isArray(data) ? data : (data.Items || []);
+
+                if (path) {
+                    var up = document.createElement('li');
+                    up.className = 'jt-dir-item';
+                    up.innerHTML = '&#128281; ..';
+                    var parent = path.replace(/[\\/][^\\/]+[\\/]?$/, '') || '';
+                    up.addEventListener('click', function () { loadDir(parent); });
+                    list.appendChild(up);
+                }
+
+                items.forEach(function (item) {
+                    var li = document.createElement('li');
+                    li.className = 'jt-dir-item';
+                    li.innerHTML = '&#128193; ' + (item.Name || item.Name);
+                    li.title = item.Path || item.Name;
+                    li.addEventListener('click', function () { loadDir(item.Path || item.Name); });
+                    list.appendChild(li);
                 });
-            } catch (e) {
-                console.error('directorybrowser error:', e);
-                alert('Ordnerbrowser Fehler: ' + e.message + '\nBitte Pfad manuell eingeben.');
-            }
-        }, function (err) {
-            console.error('directorybrowser load error:', err);
-            alert('Ordnerbrowser konnte nicht geladen werden. Bitte Pfad manuell eingeben.');
-        });
+
+                if (!items.length && path) {
+                    var empty = document.createElement('li');
+                    empty.style.cssText = 'color:#aaa;padding:0.4em 0;';
+                    empty.textContent = 'Keine Unterordner';
+                    list.appendChild(empty);
+                }
+            })
+            .catch(function () {
+                list.innerHTML = '<li style="color:#f44;padding:0.4em 0;">Fehler beim Laden</li>';
+            });
+    }
+
+    document.getElementById('jt-browse-btn').addEventListener('click', openDirBrowser);
+    document.getElementById('jt-dir-cancel').addEventListener('click', closeDirBrowser);
+    document.getElementById('jt-dir-select').addEventListener('click', function () {
+        var path = document.getElementById('jt-dir-path').textContent;
+        if (path && path !== '/') {
+            document.getElementById('StrmOutputPath').value = path;
+        }
+        closeDirBrowser();
     });
 
     document.getElementById('jt-save-btn').addEventListener('click', saveConfig);

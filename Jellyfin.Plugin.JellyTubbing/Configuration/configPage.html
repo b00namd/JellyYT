@@ -26,6 +26,38 @@
     .jt-sub-item:hover { background: #252525; }
     .jt-sub-item img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
     .jt-sub-item span { flex: 1; font-size: 0.9em; }
+    /* Directory browser overlay */
+    .jt-dir-overlay {
+        display: none; position: fixed; inset: 0; z-index: 10000;
+        background: rgba(0,0,0,0.7); align-items: center; justify-content: center;
+    }
+    .jt-dir-modal {
+        background: #1e1e1e; border: 1px solid #444; border-radius: 8px;
+        width: 480px; max-width: 95vw; max-height: 80vh;
+        display: flex; flex-direction: column; overflow: hidden;
+    }
+    .jt-dir-modal-header {
+        padding: 0.8em 1em; background: #2a2a2a; border-bottom: 1px solid #444;
+        font-weight: bold; display: flex; align-items: center; gap: 0.5em;
+    }
+    .jt-dir-current {
+        padding: 0.4em 1em; font-size: 0.85em; color: #aaa;
+        background: #161616; border-bottom: 1px solid #333;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .jt-dir-list {
+        list-style: none; margin: 0; padding: 0.4em 0;
+        overflow-y: auto; flex: 1; min-height: 200px; max-height: 340px;
+    }
+    .jt-dir-item {
+        padding: 0.45em 1em; cursor: pointer; font-size: 0.9em;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .jt-dir-item:hover { background: #2d2d2d; }
+    .jt-dir-modal-footer {
+        padding: 0.7em 1em; border-top: 1px solid #444;
+        display: flex; justify-content: flex-end; gap: 0.6em;
+    }
 </style>
 
     <div data-role="content">
@@ -200,6 +232,19 @@
                 </button>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Directory browser overlay -->
+    <div id="jt-dir-overlay" class="jt-dir-overlay">
+        <div class="jt-dir-modal">
+            <div class="jt-dir-modal-header">&#128193; Ordner auswaehlen</div>
+            <div class="jt-dir-current" id="jt-dir-path">/</div>
+            <ul class="jt-dir-list" id="jt-dir-list"></ul>
+            <div class="jt-dir-modal-footer">
+                <button id="jt-dir-cancel" is="emby-button" type="button" class="raised">Abbrechen</button>
+                <button id="jt-dir-select" is="emby-button" type="button" class="raised button-submit">Auswaehlen</button>
+            </div>
         </div>
     </div>
 
