@@ -13,7 +13,7 @@ namespace Jellyfin.Plugin.JellyTubbing.Channel;
 
 /// <summary>
 /// Jellyfin channel that shows YouTube trending videos via the YouTube Data API.
-/// Subscribed channels are synced separately as STRM files via <see cref="SyncBackgroundService"/>.
+/// Subscribed channels are synced separately as STRM files via <see cref="ChannelSyncTask"/>.
 /// </summary>
 public class JellyTubbingChannel : IChannel
 {

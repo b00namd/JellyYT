@@ -36,8 +36,7 @@
             document.getElementById('OAuthClientSecret').value  = config.OAuthClientSecret || '';
             document.getElementById('JellyfinServerUrl').value  = config.JellyfinServerUrl || 'http://localhost:8096';
             document.getElementById('StrmOutputPath').value     = config.StrmOutputPath || '';
-            document.getElementById('SyncIntervalHours').value  = config.SyncIntervalHours || 6;
-            document.getElementById('MaxVideosPerChannel').value = config.MaxVideosPerChannel || 50;
+            document.getElementById('MaxVideosPerChannel').value = config.MaxVideosPerChannel || 25;
             document.getElementById('YtDlpBinaryPath').value    = config.YtDlpBinaryPath || '';
             document.getElementById('PreferredQuality').value   = config.PreferredQuality || '720p';
             document.getElementById('TrendingRegion').value     = config.TrendingRegion || 'DE';
@@ -54,8 +53,7 @@
             config.OAuthClientId       = document.getElementById('OAuthClientId').value.trim();
             config.OAuthClientSecret   = document.getElementById('OAuthClientSecret').value.trim();
             config.StrmOutputPath      = document.getElementById('StrmOutputPath').value.trim();
-            config.SyncIntervalHours   = parseInt(document.getElementById('SyncIntervalHours').value, 10) || 6;
-            config.MaxVideosPerChannel = parseInt(document.getElementById('MaxVideosPerChannel').value, 10) || 50;
+            config.MaxVideosPerChannel = parseInt(document.getElementById('MaxVideosPerChannel').value, 10) || 25;
             config.YtDlpBinaryPath     = document.getElementById('YtDlpBinaryPath').value.trim();
             config.PreferredQuality    = document.getElementById('PreferredQuality').value;
             config.TrendingRegion      = document.getElementById('TrendingRegion').value;

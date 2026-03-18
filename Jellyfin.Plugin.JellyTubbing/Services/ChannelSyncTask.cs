@@ -1,29 +1,27 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
+using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.JellyTubbing.Services;
 
 /// <summary>
-/// Background service that periodically syncs subscribed YouTube channels to STRM files.
+/// Jellyfin scheduled task that syncs subscribed YouTube channels to STRM files.
+/// Appears under Administration → Scheduled Tasks → JellyTubbing.
 /// </summary>
-public class SyncBackgroundService : IHostedService, IDisposable
+public class ChannelSyncTask : IScheduledTask
 {
     private readonly YouTubeApiService _youtube;
     private readonly StrmService _strm;
-    private readonly ILogger<SyncBackgroundService> _logger;
-    private Timer? _timer;
+    private readonly ILogger<ChannelSyncTask> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SyncBackgroundService"/> class.
+    /// Initializes a new instance of the <see cref="ChannelSyncTask"/> class.
     /// </summary>
-    public SyncBackgroundService(
-        YouTubeApiService youtube,
-        StrmService strm,
-        ILogger<SyncBackgroundService> logger)
+    public ChannelSyncTask(YouTubeApiService youtube, StrmService strm, ILogger<ChannelSyncTask> logger)
     {
         _youtube = youtube;
         _strm    = strm;
@@ -31,50 +29,47 @@ public class SyncBackgroundService : IHostedService, IDisposable
     }
 
     /// <inheritdoc />
-    public Task StartAsync(CancellationToken ct)
+    public string Name => "Kanal-Synchronisation";
+
+    /// <inheritdoc />
+    public string Key => "JellyTubbingChannelSync";
+
+    /// <inheritdoc />
+    public string Description => "Synchronisiert abonnierte YouTube-Kanaele als STRM-Dateien in die Jellyfin-Bibliothek.";
+
+    /// <inheritdoc />
+    public string Category => "JellyTubbing";
+
+    /// <inheritdoc />
+    public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
     {
-        var intervalHours = Plugin.Instance?.Configuration.SyncIntervalHours ?? 6;
-        var interval      = TimeSpan.FromHours(Math.Max(1, intervalHours));
-
-        // Delay first run by 2 minutes to let Jellyfin finish startup
-        _timer = new Timer(
-            _ => _ = RunSyncAsync(CancellationToken.None),
-            null,
-            TimeSpan.FromMinutes(2),
-            interval);
-
-        _logger.LogInformation("JellyTubbing sync scheduled every {Hours}h.", intervalHours);
-        return Task.CompletedTask;
+        yield return new TaskTriggerInfo
+        {
+            Type          = TaskTriggerInfo.TriggerInterval,
+            IntervalTicks = TimeSpan.FromHours(24).Ticks,
+        };
     }
 
     /// <inheritdoc />
-    public Task StopAsync(CancellationToken ct)
-    {
-        _timer?.Change(Timeout.Infinite, 0);
-        return Task.CompletedTask;
-    }
-
-    /// <summary>Triggers a manual sync immediately.</summary>
-    public Task TriggerSyncAsync(CancellationToken ct) => RunSyncAsync(ct);
-
-    // -------------------------------------------------------------------------
-
-    private async Task RunSyncAsync(CancellationToken ct)
+    public async Task ExecuteAsync(IProgress<double> progress, CancellationToken ct)
     {
         var config = Plugin.Instance?.Configuration;
         if (config is null || config.SyncedChannelIds.Length == 0)
         {
             _logger.LogDebug("JellyTubbing sync: no channels configured.");
+            progress.Report(100);
             return;
         }
 
         _logger.LogInformation("JellyTubbing sync started for {Count} channel(s).", config.SyncedChannelIds.Length);
 
-        // Resolve channel names from subscriptions
         var subs   = await _youtube.GetSubscriptionsAsync(ct);
         var subMap = subs.ToDictionary(
             s => s.Snippet.ResourceId.ChannelId,
             s => s.Snippet.Title);
+
+        var total = config.SyncedChannelIds.Length;
+        var done  = 0;
 
         foreach (var channelId in config.SyncedChannelIds)
         {
@@ -102,11 +97,10 @@ public class SyncBackgroundService : IHostedService, IDisposable
             {
                 _logger.LogWarning(ex, "Sync failed for channel {ChannelId}", channelId);
             }
+
+            progress.Report(++done * 100.0 / total);
         }
 
         _logger.LogInformation("JellyTubbing sync finished.");
     }
-
-    /// <inheritdoc />
-    public void Dispose() => _timer?.Dispose();
 }

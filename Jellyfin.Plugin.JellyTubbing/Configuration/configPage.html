@@ -152,14 +152,11 @@
                         Ordner auf dem Server fuer STRM-/NFO-/Thumbnail-Dateien. Fuge diesen Ordner als Jellyfin-Bibliothek (Typ: Film) hinzu.
                     </div>
                 </div>
-                <div style="display:flex; gap:0.5em; margin-bottom:0.8em; flex-wrap:wrap;">
-                    <div class="inputContainer" style="margin:0;">
-                        <label class="inputLabel" for="SyncIntervalHours">Sync-Intervall (Stunden)</label>
-                        <input id="SyncIntervalHours" type="number" is="emby-input" style="max-width:80px;" min="1" max="168" />
-                    </div>
+                <div style="margin-bottom:0.8em;">
                     <div class="inputContainer" style="margin:0;">
                         <label class="inputLabel" for="MaxVideosPerChannel">Max. Videos pro Kanal</label>
                         <input id="MaxVideosPerChannel" type="number" is="emby-input" style="max-width:80px;" min="1" max="500" />
+                        <div class="fieldDescription">Den Sync-Zeitplan konfigurierst du unter <em>Administration → Geplante Aufgaben → JellyTubbing</em>.</div>
                     </div>
                 </div>
 

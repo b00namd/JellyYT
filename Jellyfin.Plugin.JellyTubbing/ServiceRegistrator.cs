@@ -3,6 +3,7 @@ using Jellyfin.Plugin.JellyTubbing.Services;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Plugins;
+using MediaBrowser.Model.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Jellyfin.Plugin.JellyTubbing;
@@ -21,9 +22,9 @@ public class ServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<YouTubeApiService>();
         serviceCollection.AddSingleton<StreamResolverService>();
         serviceCollection.AddSingleton<StrmService>();
-        serviceCollection.AddSingleton<SyncBackgroundService>();
+        serviceCollection.AddSingleton<ChannelSyncTask>();
 
         serviceCollection.AddSingleton<IChannel, JellyTubbingChannel>();
-        serviceCollection.AddHostedService(sp => sp.GetRequiredService<SyncBackgroundService>());
+        serviceCollection.AddSingleton<IScheduledTask>(sp => sp.GetRequiredService<ChannelSyncTask>());
     }
 }

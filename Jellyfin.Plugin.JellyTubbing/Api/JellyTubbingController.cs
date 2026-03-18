@@ -30,7 +30,7 @@ public class JellyTubbingController : ControllerBase
     private readonly OAuthService _oauth;
     private readonly YouTubeApiService _youtube;
     private readonly StreamResolverService _resolver;
-    private readonly SyncBackgroundService _sync;
+    private readonly ChannelSyncTask _sync;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JellyTubbingController"/> class.
@@ -39,7 +39,7 @@ public class JellyTubbingController : ControllerBase
         OAuthService oauth,
         YouTubeApiService youtube,
         StreamResolverService resolver,
-        SyncBackgroundService sync)
+        ChannelSyncTask sync)
     {
         _oauth    = oauth;
         _youtube  = youtube;
@@ -171,7 +171,7 @@ public class JellyTubbingController : ControllerBase
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public IActionResult TriggerSync(CancellationToken ct)
     {
-        _ = _sync.TriggerSyncAsync(ct);
+        _ = _sync.ExecuteAsync(new Progress<double>(), ct);
         return Ok(new { success = true, message = "Synchronisation gestartet." });
     }
 

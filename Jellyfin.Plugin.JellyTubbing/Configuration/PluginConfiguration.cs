@@ -46,9 +46,6 @@ public class PluginConfiguration : BasePluginConfiguration
     /// <summary>Gets or sets the channel IDs to synchronise as STRM files.</summary>
     public string[] SyncedChannelIds { get; set; } = [];
 
-    /// <summary>Gets or sets how often (hours) the background sync runs.</summary>
-    public int SyncIntervalHours { get; set; } = 24;
-
     /// <summary>Gets or sets maximum number of videos to sync per channel.</summary>
     public int MaxVideosPerChannel { get; set; } = 25;
 
