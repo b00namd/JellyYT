@@ -329,11 +329,14 @@
     // Directory browser (uses Jellyfin /Environment API)
     // -----------------------------------------------------------------------
 
+    var _dirCurrentPath = '/';
+
     function openDirBrowser() {
         var overlay = document.getElementById('jt-dir-overlay');
         if (!overlay) return;
         overlay.style.display = 'flex';
-        loadDir('');
+        var start = document.getElementById('StrmOutputPath').value.trim() || '/';
+        loadDirContents(start);
     }
 
     function closeDirBrowser() {
@@ -341,60 +344,69 @@
         if (overlay) overlay.style.display = 'none';
     }
 
-    function loadDir(path) {
-        var list    = document.getElementById('jt-dir-list');
-        var pathEl  = document.getElementById('jt-dir-path');
-        var headers = { 'X-Emby-Authorization': 'MediaBrowser Token="' + ApiClient.accessToken() + '"' };
+    function loadDirContents(path) {
+        _dirCurrentPath = path;
+        document.getElementById('jt-dir-path').textContent = path;
+        var list = document.getElementById('jt-dir-list');
+        list.innerHTML = '<div class="jt-dir-item" style="color:#888;">Wird geladen\u2026</div>';
 
-        list.innerHTML = '<li style="color:#aaa;padding:0.4em 0;">&#8987; Laden...</li>';
-        if (pathEl) pathEl.textContent = path || '/';
+        var url;
+        if (!path || path === '/') {
+            url = window.location.origin + '/Environment/Drives';
+        } else {
+            url = window.location.origin + '/Environment/DirectoryContents?path=' +
+                encodeURIComponent(path) + '&includeFiles=false&includeDirectories=true';
+        }
 
-        var url = path
-            ? '/Environment/DirectoryContents?path=' + encodeURIComponent(path) + '&includeFiles=false&includeDirectories=true'
-            : '/Environment/Drives';
-
-        fetch(url, { headers: headers })
-            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+        fetch(url, { headers: apiHeaders() })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status + ' ' + r.statusText); })
             .then(function (data) {
                 list.innerHTML = '';
                 var items = Array.isArray(data) ? data : (data.Items || []);
 
-                if (path) {
-                    var up = document.createElement('li');
-                    up.className = 'jt-dir-item';
-                    up.innerHTML = '&#128281; ..';
-                    var parent = path.replace(/[\\/][^\\/]+[\\/]?$/, '') || '';
-                    up.addEventListener('click', function () { loadDir(parent); });
-                    list.appendChild(up);
+                if (path && path !== '/') {
+                    var idx = path.replace(/[/\\]+$/, '').lastIndexOf('/');
+                    var idxBs = path.replace(/[/\\]+$/, '').lastIndexOf('\\');
+                    idx = Math.max(idx, idxBs);
+                    var parent = idx > 0 ? path.substring(0, idx) : '/';
+                    var back = document.createElement('div');
+                    back.className = 'jt-dir-item jt-dir-up';
+                    back.textContent = '\u2b06 ..';
+                    back.addEventListener('click', function () { loadDirContents(parent); });
+                    list.appendChild(back);
+                }
+
+                if (!items.length && path !== '/') {
+                    var empty = document.createElement('div');
+                    empty.className = 'jt-dir-item';
+                    empty.style.color = '#888';
+                    empty.textContent = '(Leer)';
+                    list.appendChild(empty);
+                    return;
                 }
 
                 items.forEach(function (item) {
-                    var li = document.createElement('li');
-                    li.className = 'jt-dir-item';
-                    li.innerHTML = '&#128193; ' + (item.Name || item.Name);
-                    li.title = item.Path || item.Name;
-                    li.addEventListener('click', function () { loadDir(item.Path || item.Name); });
-                    list.appendChild(li);
+                    var itemPath = item.Path || item.Name;
+                    var el = document.createElement('div');
+                    el.className = 'jt-dir-item';
+                    el.textContent = '\uD83D\uDCC1 ' + (item.Name || itemPath);
+                    el.addEventListener('click', function () { loadDirContents(itemPath); });
+                    list.appendChild(el);
                 });
-
-                if (!items.length && path) {
-                    var empty = document.createElement('li');
-                    empty.style.cssText = 'color:#aaa;padding:0.4em 0;';
-                    empty.textContent = 'Keine Unterordner';
-                    list.appendChild(empty);
-                }
             })
-            .catch(function () {
-                list.innerHTML = '<li style="color:#f44;padding:0.4em 0;">Fehler beim Laden</li>';
+            .catch(function (err) {
+                list.innerHTML = '<div class="jt-dir-item" style="color:#f44336;">Fehler: ' + String(err) + '</div>';
             });
     }
 
     document.getElementById('jt-browse-btn').addEventListener('click', openDirBrowser);
     document.getElementById('jt-dir-cancel').addEventListener('click', closeDirBrowser);
+    document.getElementById('jt-dir-overlay').addEventListener('click', function (e) {
+        if (e.target === this) closeDirBrowser();
+    });
     document.getElementById('jt-dir-select').addEventListener('click', function () {
-        var path = document.getElementById('jt-dir-path').textContent;
-        if (path && path !== '/') {
-            document.getElementById('StrmOutputPath').value = path;
+        if (_dirCurrentPath && _dirCurrentPath !== '/') {
+            document.getElementById('StrmOutputPath').value = _dirCurrentPath;
         }
         closeDirBrowser();
     });

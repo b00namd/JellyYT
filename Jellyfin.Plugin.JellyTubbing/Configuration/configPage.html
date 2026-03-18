@@ -46,14 +46,15 @@
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .jt-dir-list {
-        list-style: none; margin: 0; padding: 0.4em 0;
         overflow-y: auto; flex: 1; min-height: 200px; max-height: 340px;
+        padding: 0.4em 0;
     }
     .jt-dir-item {
         padding: 0.45em 1em; cursor: pointer; font-size: 0.9em;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .jt-dir-item:hover { background: #2d2d2d; }
+    .jt-dir-up { color: #aaa; }
     .jt-dir-modal-footer {
         padding: 0.7em 1em; border-top: 1px solid #444;
         display: flex; justify-content: flex-end; gap: 0.6em;
@@ -240,7 +241,7 @@
         <div class="jt-dir-modal">
             <div class="jt-dir-modal-header">&#128193; Ordner auswaehlen</div>
             <div class="jt-dir-current" id="jt-dir-path">/</div>
-            <ul class="jt-dir-list" id="jt-dir-list"></ul>
+            <div class="jt-dir-list" id="jt-dir-list"></div>
             <div class="jt-dir-modal-footer">
                 <button id="jt-dir-cancel" is="emby-button" type="button" class="raised">Abbrechen</button>
                 <button id="jt-dir-select" is="emby-button" type="button" class="raised button-submit">Auswaehlen</button>
