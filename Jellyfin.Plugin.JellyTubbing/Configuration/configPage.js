@@ -326,8 +326,9 @@
     });
 
     document.getElementById('jt-browse-btn').addEventListener('click', function () {
-        require(['directorybrowser'], function (directoryBrowser) {
-            directoryBrowser.show({
+        require(['directorybrowser'], function (DirectoryBrowser) {
+            var picker = new DirectoryBrowser();
+            picker.show({
                 callback: function (path) {
                     if (path) document.getElementById('StrmOutputPath').value = path;
                 },
