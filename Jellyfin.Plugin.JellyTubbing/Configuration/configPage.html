@@ -6,96 +6,183 @@
     <meta name="language" content="de" />
 </head>
 <body>
-    <div id="JellyTubbingConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select">
-    <style>
-        .jt-section { margin-bottom: 2em; }
-        .jt-section h2 { border-bottom: 1px solid #444; padding-bottom: 0.3em; }
-        .jt-status-bar {
-            display: inline-flex; gap: 1em; align-items: center;
-            padding: 0.5em 1em; background: #1a1a1a; border: 1px solid #333;
-            border-radius: 6px; margin-bottom: 1.5em; font-size: 0.9em;
-        }
-        .jt-ok  { color: #4caf50; font-weight: bold; }
-        .jt-err { color: #f44336; font-weight: bold; }
-        .jt-info { color: #aaa; }
-    </style>
+<div id="JellyTubbingConfigPage" data-role="page" class="page type-interior pluginConfigurationPage"
+     data-require="emby-input,emby-button,emby-select,emby-checkbox">
+<style>
+    .jt-section { margin-bottom: 2em; }
+    .jt-section h2 { border-bottom: 1px solid #444; padding-bottom: 0.3em; }
+    .jt-status-bar {
+        display: inline-flex; gap: 1em; align-items: center;
+        padding: 0.5em 1em; background: #1a1a1a; border: 1px solid #333;
+        border-radius: 6px; margin-bottom: 1.5em; font-size: 0.9em; flex-wrap: wrap;
+    }
+    .jt-ok   { color: #4caf50; font-weight: bold; }
+    .jt-err  { color: #f44336; font-weight: bold; }
+    .jt-info { color: #aaa; }
+    .jt-sub-list { display: flex; flex-direction: column; gap: 0.5em; max-height: 400px; overflow-y: auto;
+                   padding: 0.5em; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; margin-top: 0.5em; }
+    .jt-sub-item { display: flex; align-items: center; gap: 0.8em; padding: 0.3em 0.5em;
+                   border-radius: 4px; cursor: pointer; }
+    .jt-sub-item:hover { background: #252525; }
+    .jt-sub-item img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .jt-sub-item span { flex: 1; font-size: 0.9em; }
+</style>
 
-        <div data-role="content">
-            <div class="content-primary">
+    <div data-role="content">
+        <div class="content-primary">
 
-                <div class="jt-section">
-                    <h2>JellyTubbing – Einstellungen</h2>
-
-                    <div class="jt-status-bar">
-                        <span id="jt-invidious-status"><span class="jt-info">&#8987; Invidious-Status wird geprüft…</span></span>
-                        <span id="jt-ytdlp-status"><span class="jt-info">&#8987; yt-dlp wird geprüft…</span></span>
-                    </div>
-
-                    <form id="jt-config-form">
-
-                        <div class="inputContainer">
-                            <label class="inputLabel" for="InvidiousInstanceUrl">Invidious-Instanz URL</label>
-                            <input id="InvidiousInstanceUrl" name="InvidiousInstanceUrl" type="text" is="emby-input"
-                                   placeholder="https://invidious.example.com" style="max-width:500px;" />
-                            <div class="fieldDescription">
-                                URL einer Invidious-Instanz. Eigene Instanz empfohlen für zuverlässige Nutzung.
-                                Öffentliche Instanzen: <a href="https://api.invidious.io" target="_blank">api.invidious.io</a>
-                            </div>
-                        </div>
-
-                        <div class="inputContainer">
-                            <label class="inputLabel" for="YtDlpBinaryPath">yt-dlp Programmpfad (Fallback, optional)</label>
-                            <input id="YtDlpBinaryPath" name="YtDlpBinaryPath" type="text" is="emby-input"
-                                   placeholder="z.B. /usr/local/bin/yt-dlp" style="max-width:500px;" />
-                            <div class="fieldDescription">
-                                Wird verwendet, wenn Invidious keinen Stream liefern kann. Leer lassen, wenn yt-dlp im PATH liegt.
-                            </div>
-                        </div>
-
-                        <div class="inputContainer">
-                            <label class="inputLabel" for="PreferredQuality">Bevorzugte Qualität</label>
-                            <select id="PreferredQuality" name="PreferredQuality" is="emby-select" style="max-width:160px;">
-                                <option value="1080p">1080p</option>
-                                <option value="720p">720p (Standard)</option>
-                                <option value="480p">480p</option>
-                                <option value="360p">360p</option>
-                            </select>
-                            <div class="fieldDescription">Maximale Auflösung für die progressive Invidious-Stream-Auflösung und yt-dlp-Fallback.</div>
-                        </div>
-
-                        <div class="inputContainer">
-                            <label class="inputLabel" for="TrendingRegion">Trending-Region</label>
-                            <input id="TrendingRegion" name="TrendingRegion" type="text" is="emby-input"
-                                   placeholder="DE" style="max-width:80px;" />
-                            <div class="fieldDescription">ISO 3166-1 alpha-2 Ländercode für Trending-Videos (z.B. DE, US, GB).</div>
-                        </div>
-
-                        <div style="margin-top:1em;">
-                            <button id="jt-test-btn" is="emby-button" type="button" class="raised">
-                                Invidious testen
-                            </button>
-                            &nbsp;
-                            <button id="jt-save-btn" is="emby-button" type="button" class="raised button-submit">
-                                Einstellungen speichern
-                            </button>
-                        </div>
-
-                    </form>
+            <!-- Header + Status -->
+            <div class="jt-section">
+                <h2>JellyTubbing – Einstellungen</h2>
+                <div class="jt-status-bar">
+                    <span id="jt-ytdlp-status"><span class="jt-info">&#8987; yt-dlp wird geprueft...</span></span>
+                    <span id="jt-oauth-status"><span class="jt-info">&#8987; Google-Status wird geprueft...</span></span>
                 </div>
-
-                <div class="jt-section">
-                    <h2>Hinweis</h2>
-                    <p style="color:#aaa;font-size:0.9em;">
-                        JellyTubbing erscheint als <strong>Kanal</strong> in deiner Jellyfin-Bibliothek (Dashboard → Kanäle).
-                        Dort kannst du Trending-Videos durchsuchen und YouTube-Videos direkt abspielen.
-                        Die Suche ist über die Jellyfin-Suchfunktion verfügbar.
-                    </p>
-                </div>
-
             </div>
-        </div>
 
-        <script src="/api/jellytubbing/ui"></script>
+            <!-- YouTube API -->
+            <div class="jt-section">
+                <h2>YouTube Data API</h2>
+                <div class="inputContainer">
+                    <label class="inputLabel" for="YouTubeApiKey">API-Key</label>
+                    <input id="YouTubeApiKey" type="text" is="emby-input" style="max-width:500px;"
+                           placeholder="AIza..." />
+                    <div class="fieldDescription">
+                        Erforderlich fuer Trending-Kanal und Kanal-Synchronisation.
+                        Erstelle einen Key in der
+                        <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>
+                        (YouTube Data API v3 aktivieren).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Google OAuth -->
+            <div class="jt-section">
+                <h2>Google-Konto (Abonnements)</h2>
+                <div class="inputContainer">
+                    <label class="inputLabel" for="OAuthClientId">OAuth2 Client-ID</label>
+                    <input id="OAuthClientId" type="text" is="emby-input" style="max-width:500px;" placeholder="...apps.googleusercontent.com" />
+                </div>
+                <div class="inputContainer">
+                    <label class="inputLabel" for="OAuthClientSecret">OAuth2 Client-Secret</label>
+                    <input id="OAuthClientSecret" type="password" is="emby-input" style="max-width:300px;" placeholder="GOCSPX-..." />
+                    <div class="fieldDescription">
+                        Erstelle OAuth2-Credentials (Typ: Webanwendung) in der Google Cloud Console.
+                        Trage als autorisierten Redirect-URI ein:
+                        <code id="jt-redirect-hint" style="color:#4caf50;"></code>
+                    </div>
+                </div>
+                <div class="inputContainer">
+                    <label class="inputLabel" for="JellyfinServerUrl">Jellyfin Server-URL</label>
+                    <input id="JellyfinServerUrl" type="text" is="emby-input" style="max-width:400px;" placeholder="http://localhost:8096" />
+                    <div class="fieldDescription">Basis-URL deines Jellyfin-Servers. Wird fuer OAuth-Redirect und STRM-Dateien verwendet.</div>
+                </div>
+                <div style="margin-top:1em; display:flex; gap:0.8em; align-items:center; flex-wrap:wrap;">
+                    <button id="jt-oauth-btn" is="emby-button" type="button" class="raised">
+                        Mit Google verbinden
+                    </button>
+                    <button id="jt-oauth-revoke-btn" is="emby-button" type="button" class="raised" style="display:none;">
+                        Verbindung trennen
+                    </button>
+                </div>
+            </div>
+
+            <!-- Abonnements -->
+            <div class="jt-section">
+                <h2>Abonnements synchronisieren</h2>
+                <div class="inputContainer">
+                    <label class="inputLabel" for="StrmOutputPath">STRM-Ausgabeordner</label>
+                    <input id="StrmOutputPath" type="text" is="emby-input" style="max-width:500px;"
+                           placeholder="/media/youtube" />
+                    <div class="fieldDescription">
+                        Ordner fuer STRM-/NFO-/Thumbnail-Dateien. Fuge diesen Ordner als Jellyfin-Bibliothek (Typ: Film) hinzu.
+                    </div>
+                </div>
+                <div style="display:flex; gap:0.5em; margin-bottom:0.8em; flex-wrap:wrap;">
+                    <div class="inputContainer" style="margin:0;">
+                        <label class="inputLabel" for="SyncIntervalHours">Sync-Intervall (Stunden)</label>
+                        <input id="SyncIntervalHours" type="number" is="emby-input" style="max-width:80px;" min="1" max="168" />
+                    </div>
+                    <div class="inputContainer" style="margin:0;">
+                        <label class="inputLabel" for="MaxVideosPerChannel">Max. Videos pro Kanal</label>
+                        <input id="MaxVideosPerChannel" type="number" is="emby-input" style="max-width:80px;" min="1" max="500" />
+                    </div>
+                </div>
+
+                <div id="jt-subs-container">
+                    <p class="jt-info" id="jt-subs-hint">Verbinde dein Google-Konto, um Abonnements zu laden.</p>
+                    <div id="jt-sub-list" class="jt-sub-list" style="display:none;"></div>
+                </div>
+
+                <div style="margin-top:1em;">
+                    <button id="jt-load-subs-btn" is="emby-button" type="button" class="raised" style="display:none;">
+                        Abonnements neu laden
+                    </button>
+                    &nbsp;
+                    <button id="jt-sync-btn" is="emby-button" type="button" class="raised" style="display:none;">
+                        Jetzt synchronisieren
+                    </button>
+                </div>
+            </div>
+
+            <!-- Streaming -->
+            <div class="jt-section">
+                <h2>Streaming</h2>
+                <div class="inputContainer">
+                    <label class="inputLabel" for="YtDlpBinaryPath">yt-dlp Programmpfad (optional)</label>
+                    <input id="YtDlpBinaryPath" type="text" is="emby-input" style="max-width:500px;"
+                           placeholder="/usr/local/bin/yt-dlp" />
+                    <div class="fieldDescription">Leer lassen, wenn yt-dlp im PATH liegt.</div>
+                </div>
+                <div class="inputContainer">
+                    <label class="inputLabel" for="PreferredQuality">Bevorzugte Qualitaet</label>
+                    <select id="PreferredQuality" is="emby-select" style="max-width:160px;">
+                        <option value="1080p">1080p</option>
+                        <option value="720p">720p (Standard)</option>
+                        <option value="480p">480p</option>
+                        <option value="360p">360p</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Trending-Kanal -->
+            <div class="jt-section">
+                <h2>Trending-Kanal</h2>
+                <div class="inputContainer">
+                    <label class="inputLabel" for="TrendingRegion">Land der Inhalte</label>
+                    <select id="TrendingRegion" is="emby-select" style="max-width:220px;">
+                        <option value="DE">Deutschland (DE)</option>
+                        <option value="AT">Oesterreich (AT)</option>
+                        <option value="CH">Schweiz (CH)</option>
+                        <option value="US">USA (US)</option>
+                        <option value="GB">Vereinigtes Koenigreich (GB)</option>
+                        <option value="FR">Frankreich (FR)</option>
+                        <option value="IT">Italien (IT)</option>
+                        <option value="ES">Spanien (ES)</option>
+                        <option value="NL">Niederlande (NL)</option>
+                        <option value="PL">Polen (PL)</option>
+                        <option value="JP">Japan (JP)</option>
+                        <option value="KR">Suedkorea (KR)</option>
+                        <option value="IN">Indien (IN)</option>
+                        <option value="BR">Brasilien (BR)</option>
+                        <option value="CA">Kanada (CA)</option>
+                        <option value="AU">Australien (AU)</option>
+                    </select>
+                    <div class="fieldDescription">Land fuer Trending-Videos im JellyTubbing-Kanal.</div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="margin-top:1.5em;">
+                <button id="jt-save-btn" is="emby-button" type="button" class="raised button-submit">
+                    Einstellungen speichern
+                </button>
+            </div>
+
+        </div>
     </div>
+
+    <script src="/api/jellytubbing/ui"></script>
+</div>
 </body>
 </html>

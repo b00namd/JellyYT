@@ -16,8 +16,14 @@ public class ServiceRegistrator : IPluginServiceRegistrator
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
         serviceCollection.AddHttpClient("jellytubbing");
-        serviceCollection.AddSingleton<InvidiousService>();
+
+        serviceCollection.AddSingleton<OAuthService>();
+        serviceCollection.AddSingleton<YouTubeApiService>();
         serviceCollection.AddSingleton<StreamResolverService>();
+        serviceCollection.AddSingleton<StrmService>();
+        serviceCollection.AddSingleton<SyncBackgroundService>();
+
         serviceCollection.AddSingleton<IChannel, JellyTubbingChannel>();
+        serviceCollection.AddHostedService(sp => sp.GetRequiredService<SyncBackgroundService>());
     }
 }

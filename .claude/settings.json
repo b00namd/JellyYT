@@ -11,7 +11,12 @@
       "Bash(unzip -l jc.zip)",
       "Bash(powershell.exe -ExecutionPolicy Bypass -File \"c:\\\\Users\\\\b00na\\\\Nextcloud2\\\\Projekte\\\\JellyFin YT\\\\build.ps1\")",
       "Bash(xxd \"c:\\\\Users\\\\b00na\\\\Nextcloud2\\\\Projekte\\\\JellyFin YT\\\\build.ps1\")",
-      "Bash(unix2dos \"c:\\\\Users\\\\b00na\\\\Nextcloud2\\\\Projekte\\\\JellyFin YT\\\\build.ps1\")"
+      "Bash(unix2dos \"c:\\\\Users\\\\b00na\\\\Nextcloud2\\\\Projekte\\\\JellyFin YT\\\\build.ps1\")",
+      "Bash(powershell -command \"[System.Reflection.Assembly]::LoadFrom\\(''C:/Users/b00na/.nuget/packages/jellyfin.controller/10.9.11/lib/net8.0/MediaBrowser.Controller.dll''\\).GetTypes\\(\\) | Where-Object { $_.Name -like ''*Search*'' -or $_.Name -like ''*Channel*'' } | Select-Object -ExpandProperty FullName\")",
+      "WebSearch"
+    ],
+    "additionalDirectories": [
+      "\\tmp\\JFTest"
     ]
   }
 }

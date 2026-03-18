@@ -9,32 +9,51 @@
             REST API endpoints for the JellyTubbing plugin.
             </summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.#ctor(Jellyfin.Plugin.JellyTubbing.Services.InvidiousService)">
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.#ctor(Jellyfin.Plugin.JellyTubbing.Services.OAuthService,Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService,Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService,Jellyfin.Plugin.JellyTubbing.Services.SyncBackgroundService)">
             <summary>
             Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController"/> class.
             </summary>
         </member>
         <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.GetUiScript">
-            <summary>
-            Serves the embedded configuration page JavaScript.
-            </summary>
-        </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.TestInvidious(System.Threading.CancellationToken)">
-            <summary>
-            Tests whether the configured Invidious instance is reachable.
-            </summary>
+            <summary>Serves the embedded configuration page JavaScript.</summary>
         </member>
         <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.CheckTools">
+            <summary>Checks whether yt-dlp is available on the server.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.GetOAuthUrl">
+            <summary>Returns the Google OAuth2 authorization URL for the config page popup.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.OAuthCallback(System.String,System.String,System.Threading.CancellationToken)">
             <summary>
-            Checks whether yt-dlp is available on the server.
+            Handles the Google OAuth2 callback. Exchanges the authorization code for tokens
+            and returns an HTML page that closes the popup and notifies the opener.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.GetOAuthStatus">
+            <summary>Returns the current OAuth authorization status.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.RevokeOAuth">
+            <summary>Revokes the stored OAuth tokens.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.GetSubscriptions(System.Threading.CancellationToken)">
+            <summary>Returns the user's YouTube subscriptions (requires OAuth).</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.TriggerSync(System.Threading.CancellationToken)">
+            <summary>Triggers an immediate sync of all configured channels.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.StreamVideo(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Resolves a YouTube video ID to a direct stream URL and returns a 302 redirect.
+            Used by the .strm files generated for subscribed channels.
             </summary>
         </member>
         <member name="T:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel">
             <summary>
-            Jellyfin channel that streams YouTube videos via Invidious (with yt-dlp fallback).
+            Jellyfin channel that shows YouTube trending videos via the YouTube Data API.
+            Subscribed channels are synced separately as STRM files via <see cref="T:Jellyfin.Plugin.JellyTubbing.Services.SyncBackgroundService"/>.
             </summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.#ctor(Jellyfin.Plugin.JellyTubbing.Services.InvidiousService,Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService)">
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel.#ctor(Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService,Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService)">
             <summary>
             Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel"/> class.
             </summary>
@@ -77,11 +96,41 @@
             Configuration for JellyTubbing plugin.
             </summary>
         </member>
-        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.InvidiousInstanceUrl">
-            <summary>Gets or sets the Invidious instance base URL (e.g. https://invidious.example.com).</summary>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.YouTubeApiKey">
+            <summary>Gets or sets the YouTube Data API v3 key (required for trending and channel videos).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.OAuthClientId">
+            <summary>Gets or sets the OAuth2 client ID from Google Cloud Console.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.OAuthClientSecret">
+            <summary>Gets or sets the OAuth2 client secret from Google Cloud Console.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.OAuthAccessToken">
+            <summary>Gets or sets the stored OAuth2 access token.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.OAuthRefreshToken">
+            <summary>Gets or sets the stored OAuth2 refresh token.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.OAuthTokenExpiryUnix">
+            <summary>Gets or sets the expiry of the access token as Unix timestamp (seconds).</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.StrmOutputPath">
+            <summary>Gets or sets the output folder for STRM/NFO/thumbnail files.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.JellyfinServerUrl">
+            <summary>Gets or sets the Jellyfin server base URL used inside STRM files.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.SyncedChannelIds">
+            <summary>Gets or sets the channel IDs to synchronise as STRM files.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.SyncIntervalHours">
+            <summary>Gets or sets how often (hours) the background sync runs.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.MaxVideosPerChannel">
+            <summary>Gets or sets maximum number of videos to sync per channel.</summary>
         </member>
         <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.YtDlpBinaryPath">
-            <summary>Gets or sets the optional path to the yt-dlp binary for fallback stream resolution.</summary>
+            <summary>Gets or sets the optional path to the yt-dlp binary.</summary>
         </member>
         <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.PreferredQuality">
             <summary>Gets or sets the preferred stream quality (360p, 480p, 720p, 1080p).</summary>
@@ -89,17 +138,53 @@
         <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.TrendingRegion">
             <summary>Gets or sets the ISO 3166-1 alpha-2 region code for trending videos (e.g. DE, US).</summary>
         </member>
-        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.InvidiousVideoItem">
-            <summary>A video item returned by Invidious search or trending endpoints.</summary>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeVideoListResponse">
+            <summary>YouTube Data API v3 – videos.list response.</summary>
         </member>
-        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.InvidiousThumbnail">
-            <summary>A thumbnail entry from Invidious.</summary>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeVideoItem">
+            <summary>A single video item from the YouTube Data API.</summary>
         </member>
-        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.InvidiousVideoDetail">
-            <summary>Detailed video info including progressive stream URLs.</summary>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeVideoSnippet">
+            <summary>Snippet block of a YouTube video.</summary>
         </member>
-        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.InvidiousFormatStream">
-            <summary>A progressive (combined video+audio) stream from Invidious.</summary>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeContentDetails">
+            <summary>Content details block of a YouTube video.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Models.YouTubeContentDetails.Duration">
+            <summary>ISO 8601 duration string, e.g. PT4M13S.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeThumbnails">
+            <summary>Thumbnail variants for a YouTube resource.</summary>
+        </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Models.YouTubeThumbnails.BestUrl">
+            <summary>Best available thumbnail URL, highest resolution first.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeThumbnail">
+            <summary>A single thumbnail entry.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeSubscriptionListResponse">
+            <summary>YouTube Data API v3 – subscriptions.list response.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeSubscriptionItem">
+            <summary>A single subscription item.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeSubscriptionSnippet">
+            <summary>Snippet of a subscription.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeResourceId">
+            <summary>Resource identifier inside a subscription snippet.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeSearchListResponse">
+            <summary>YouTube Data API v3 – search.list response.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeSearchItem">
+            <summary>A single search result item.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.YouTubeSearchItemId">
+            <summary>The id block of a search result.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Models.OAuthTokenResponse">
+            <summary>Google OAuth2 token response.</summary>
         </member>
         <member name="T:Jellyfin.Plugin.JellyTubbing.Plugin">
             <summary>
@@ -134,46 +219,106 @@
         <member name="M:Jellyfin.Plugin.JellyTubbing.ServiceRegistrator.RegisterServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,MediaBrowser.Controller.IServerApplicationHost)">
             <inheritdoc />
         </member>
-        <member name="T:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService">
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Services.OAuthService">
             <summary>
-            Communicates with an Invidious instance to search videos, fetch trending and resolve stream URLs.
+            Handles Google OAuth2 authorization code flow for YouTube read-only access.
             </summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService.#ctor(System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTubbing.Services.InvidiousService})">
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.OAuthService.#ctor(System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTubbing.Services.OAuthService})">
             <summary>
-            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService"/> class.
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Services.OAuthService"/> class.
             </summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService.IsReachableAsync(System.Threading.CancellationToken)">
-            <summary>Checks whether the configured Invidious instance is reachable.</summary>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Services.OAuthService.IsAuthorized">
+            <summary>Returns true when a (possibly refreshable) token is stored.</summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService.SearchAsync(System.String,System.Threading.CancellationToken)">
-            <summary>Searches YouTube via Invidious and returns channel items.</summary>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.OAuthService.GetAuthorizationUrl(System.String)">
+            <summary>Builds the Google authorization URL to redirect the user to.</summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService.GetTrendingAsync(System.Threading.CancellationToken)">
-            <summary>Returns trending videos for the configured region.</summary>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.OAuthService.ExchangeCodeAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>Exchanges an authorization code for access + refresh tokens and stores them.</summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.InvidiousService.GetBestStreamUrlAsync(System.String,System.Threading.CancellationToken)">
-            <summary>
-            Fetches the best progressive MP4 stream URL for a video from Invidious.
-            Returns <c>null</c> if unavailable.
-            </summary>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.OAuthService.GetValidAccessTokenAsync(System.Threading.CancellationToken)">
+            <summary>Returns a valid access token, refreshing if necessary. Returns null if not authorized.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.OAuthService.Revoke">
+            <summary>Clears all stored OAuth tokens.</summary>
         </member>
         <member name="T:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService">
             <summary>
-            Resolves a YouTube video ID to a direct stream URL.
-            Primary: Invidious progressive stream. Fallback: yt-dlp -g.
+            Resolves a YouTube video ID to a direct stream URL via yt-dlp.
+            Used by the JellyTubbing channel for on-demand trending video playback.
             </summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService.#ctor(Jellyfin.Plugin.JellyTubbing.Services.InvidiousService,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService})">
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService.#ctor(Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService})">
             <summary>
             Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService"/> class.
             </summary>
         </member>
         <member name="M:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService.ResolveAsync(System.String,System.Threading.CancellationToken)">
+            <summary>Resolves a YouTube video ID to a <see cref="T:MediaBrowser.Model.Dto.MediaSourceInfo"/> via yt-dlp.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService.ResolveUrlAsync(System.String,System.Threading.CancellationToken)">
+            <summary>Resolves a YouTube video URL to a direct stream URL string via yt-dlp -g.</summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Services.StrmService">
             <summary>
-            Returns one or more <see cref="T:MediaBrowser.Model.Dto.MediaSourceInfo"/> for the given YouTube video ID.
+            Creates .strm, .nfo and thumbnail files for YouTube videos in the configured output folder.
             </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.StrmService.#ctor(System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTubbing.Services.StrmService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Services.StrmService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.StrmService.CreateVideoFilesAsync(System.String,System.String,System.String,System.String,System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Creates .strm / .nfo / thumbnail for a single video if they do not already exist.
+            </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Services.SyncBackgroundService">
+            <summary>
+            Background service that periodically syncs subscribed YouTube channels to STRM files.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.SyncBackgroundService.#ctor(Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService,Jellyfin.Plugin.JellyTubbing.Services.StrmService,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTubbing.Services.SyncBackgroundService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Services.SyncBackgroundService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.SyncBackgroundService.StartAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.SyncBackgroundService.StopAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.SyncBackgroundService.TriggerSyncAsync(System.Threading.CancellationToken)">
+            <summary>Triggers a manual sync immediately.</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.SyncBackgroundService.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService">
+            <summary>
+            Wraps the YouTube Data API v3 for trending, subscriptions and channel video listing.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService.#ctor(System.Net.Http.IHttpClientFactory,Jellyfin.Plugin.JellyTubbing.Services.OAuthService,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService.GetTrendingAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Returns trending videos for the configured region.
+            Pass a YouTube video category ID (e.g. "10" for Music) or null for all categories.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService.GetSubscriptionsAsync(System.Threading.CancellationToken)">
+            <summary>Returns all subscriptions of the authenticated user (paginates automatically).</summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService.GetChannelVideosAsync(System.String,System.Int32,System.Threading.CancellationToken)">
+            <summary>Returns the most recent videos from a YouTube channel.</summary>
         </member>
     </members>
 </doc>

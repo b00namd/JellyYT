@@ -1,8 +1,8 @@
 (function () {
     'use strict';
 
-    var API_BASE   = '/api/jellytubbing';
-    var PLUGIN_ID  = 'c3d4e5f6-a7b8-9012-cdef-012345678901';
+    var API_BASE  = '/api/jellytubbing';
+    var PLUGIN_ID = 'c3d4e5f6-a7b8-9012-cdef-012345678901';
 
     function apiHeaders() {
         return {
@@ -13,7 +13,7 @@
 
     function showToast(msg) {
         if (typeof require === 'function') {
-            require(['toast'], function (toast) { toast(msg); });
+            require(['toast'], function (t) { t(msg); });
             return;
         }
         var el = document.createElement('div');
@@ -28,57 +28,66 @@
     // -----------------------------------------------------------------------
     // Config load / save
     // -----------------------------------------------------------------------
+
     function loadConfig() {
         ApiClient.getPluginConfiguration(PLUGIN_ID).then(function (config) {
-            document.getElementById('InvidiousInstanceUrl').value = config.InvidiousInstanceUrl || '';
-            document.getElementById('YtDlpBinaryPath').value      = config.YtDlpBinaryPath || '';
-            document.getElementById('PreferredQuality').value     = config.PreferredQuality || '720p';
-            document.getElementById('TrendingRegion').value       = config.TrendingRegion || 'DE';
+            document.getElementById('YouTubeApiKey').value      = config.YouTubeApiKey || '';
+            document.getElementById('OAuthClientId').value      = config.OAuthClientId || '';
+            document.getElementById('OAuthClientSecret').value  = config.OAuthClientSecret || '';
+            document.getElementById('JellyfinServerUrl').value  = config.JellyfinServerUrl || 'http://localhost:8096';
+            document.getElementById('StrmOutputPath').value     = config.StrmOutputPath || '';
+            document.getElementById('SyncIntervalHours').value  = config.SyncIntervalHours || 6;
+            document.getElementById('MaxVideosPerChannel').value = config.MaxVideosPerChannel || 50;
+            document.getElementById('YtDlpBinaryPath').value    = config.YtDlpBinaryPath || '';
+            document.getElementById('PreferredQuality').value   = config.PreferredQuality || '720p';
+            document.getElementById('TrendingRegion').value     = config.TrendingRegion || 'DE';
+
+            // Show OAuth redirect hint
+            var serverUrl = (config.JellyfinServerUrl || 'http://localhost:8096').replace(/\/+$/, '');
+            var hint = document.getElementById('jt-redirect-hint');
+            if (hint) hint.textContent = serverUrl + '/api/jellytubbing/oauth-callback';
+
+            // Store synced channel IDs for checkbox rendering
+            window._jtSyncedIds = config.SyncedChannelIds || [];
         });
     }
 
     function saveConfig() {
         ApiClient.getPluginConfiguration(PLUGIN_ID).then(function (config) {
-            config.InvidiousInstanceUrl = document.getElementById('InvidiousInstanceUrl').value.trim();
-            config.YtDlpBinaryPath      = document.getElementById('YtDlpBinaryPath').value.trim();
-            config.PreferredQuality     = document.getElementById('PreferredQuality').value;
-            config.TrendingRegion       = document.getElementById('TrendingRegion').value.trim().toUpperCase() || 'DE';
+            config.YouTubeApiKey       = document.getElementById('YouTubeApiKey').value.trim();
+            config.OAuthClientId       = document.getElementById('OAuthClientId').value.trim();
+            config.OAuthClientSecret   = document.getElementById('OAuthClientSecret').value.trim();
+            config.JellyfinServerUrl   = document.getElementById('JellyfinServerUrl').value.trim() || 'http://localhost:8096';
+            config.StrmOutputPath      = document.getElementById('StrmOutputPath').value.trim();
+            config.SyncIntervalHours   = parseInt(document.getElementById('SyncIntervalHours').value, 10) || 6;
+            config.MaxVideosPerChannel = parseInt(document.getElementById('MaxVideosPerChannel').value, 10) || 50;
+            config.YtDlpBinaryPath     = document.getElementById('YtDlpBinaryPath').value.trim();
+            config.PreferredQuality    = document.getElementById('PreferredQuality').value;
+            config.TrendingRegion      = document.getElementById('TrendingRegion').value;
+
+            // Collect checked subscriptions
+            var checked = document.querySelectorAll('.jt-sub-checkbox:checked');
+            config.SyncedChannelIds = Array.from(checked).map(function (cb) { return cb.dataset.channelId; });
+
+            // Update redirect hint
+            var serverUrl = config.JellyfinServerUrl.replace(/\/+$/, '');
+            var hint = document.getElementById('jt-redirect-hint');
+            if (hint) hint.textContent = serverUrl + '/api/jellytubbing/oauth-callback';
 
             ApiClient.updatePluginConfiguration(PLUGIN_ID, config).then(function () {
                 showToast('Einstellungen gespeichert.');
-                checkInvidious();
                 checkYtDlp();
             });
         });
     }
 
     // -----------------------------------------------------------------------
-    // Invidious status check
+    // yt-dlp check
     // -----------------------------------------------------------------------
-    function checkInvidious() {
-        var el = document.getElementById('jt-invidious-status');
-        el.innerHTML = '<span class="jt-info">&#8987; Prüfe Invidious-Verbindung…</span>';
 
-        fetch(API_BASE + '/test-invidious', { headers: apiHeaders() })
-            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
-            .then(function (data) {
-                if (data.reachable) {
-                    el.innerHTML = '<span class="jt-ok">&#10003;</span> Invidious erreichbar: ' + (data.message || '');
-                } else {
-                    el.innerHTML = '<span class="jt-err">&#10007;</span> ' + (data.message || 'Invidious nicht erreichbar');
-                }
-            })
-            .catch(function () {
-                el.innerHTML = '<span class="jt-err">&#10007;</span> Verbindungsfehler';
-            });
-    }
-
-    // -----------------------------------------------------------------------
-    // yt-dlp status check
-    // -----------------------------------------------------------------------
     function checkYtDlp() {
         var el = document.getElementById('jt-ytdlp-status');
-        el.innerHTML = '<span class="jt-info">&#8987; yt-dlp wird geprüft…</span>';
+        el.innerHTML = '<span class="jt-info">&#8987; yt-dlp wird geprueft...</span>';
 
         fetch(API_BASE + '/check-tools', { headers: apiHeaders() })
             .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
@@ -96,16 +105,162 @@
     }
 
     // -----------------------------------------------------------------------
+    // OAuth status
+    // -----------------------------------------------------------------------
+
+    function checkOAuthStatus() {
+        var el = document.getElementById('jt-oauth-status');
+        el.innerHTML = '<span class="jt-info">&#8987; Google-Status wird geprueft...</span>';
+
+        fetch(API_BASE + '/oauth-status', { headers: apiHeaders() })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (data) {
+                var oauthBtn  = document.getElementById('jt-oauth-btn');
+                var revokeBtn = document.getElementById('jt-oauth-revoke-btn');
+                var loadBtn   = document.getElementById('jt-load-subs-btn');
+                var syncBtn   = document.getElementById('jt-sync-btn');
+
+                if (data.authorized) {
+                    el.innerHTML = '<span class="jt-ok">&#10003;</span> Mit Google verbunden';
+                    if (oauthBtn)  oauthBtn.style.display  = 'none';
+                    if (revokeBtn) revokeBtn.style.display  = '';
+                    if (loadBtn)   loadBtn.style.display    = '';
+                    if (syncBtn)   syncBtn.style.display    = '';
+                    loadSubscriptions();
+                } else {
+                    el.innerHTML = '<span class="jt-info">Nicht mit Google verbunden</span>';
+                    if (oauthBtn)  oauthBtn.style.display  = '';
+                    if (revokeBtn) revokeBtn.style.display  = 'none';
+                    if (loadBtn)   loadBtn.style.display    = 'none';
+                    if (syncBtn)   syncBtn.style.display    = 'none';
+                }
+            })
+            .catch(function () {
+                var el2 = document.getElementById('jt-oauth-status');
+                if (el2) el2.innerHTML = '<span class="jt-err">&#10007;</span> Statusfehler';
+            });
+    }
+
+    // -----------------------------------------------------------------------
+    // OAuth popup
+    // -----------------------------------------------------------------------
+
+    window.jt_oauthComplete = function (success) {
+        if (success) {
+            showToast('Google-Konto verbunden!');
+            checkOAuthStatus();
+        } else {
+            showToast('OAuth fehlgeschlagen. Pruefen Sie Client-ID und Secret.');
+        }
+    };
+
+    function startOAuth() {
+        fetch(API_BASE + '/oauth-url', { headers: apiHeaders() })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (data) {
+                if (!data.success) { showToast(data.message || 'Fehler'); return; }
+                var popup = window.open(data.url, 'jtOAuth', 'width=600,height=700,noopener=0');
+                if (!popup) showToast('Popup wurde blockiert. Bitte Popup-Blocker deaktivieren.');
+            })
+            .catch(function () { showToast('Fehler beim Abrufen der OAuth-URL.'); });
+    }
+
+    function revokeOAuth() {
+        fetch(API_BASE + '/oauth-revoke', { method: 'POST', headers: apiHeaders() })
+            .then(function () {
+                showToast('Google-Verbindung getrennt.');
+                checkOAuthStatus();
+                document.getElementById('jt-sub-list').style.display = 'none';
+                var hint = document.getElementById('jt-subs-hint');
+                if (hint) { hint.style.display = ''; hint.textContent = 'Verbinde dein Google-Konto, um Abonnements zu laden.'; }
+            });
+    }
+
+    // -----------------------------------------------------------------------
+    // Subscriptions
+    // -----------------------------------------------------------------------
+
+    function loadSubscriptions() {
+        var hint    = document.getElementById('jt-subs-hint');
+        var listEl  = document.getElementById('jt-sub-list');
+        if (hint)   { hint.textContent = 'Abonnements werden geladen...'; hint.style.display = ''; }
+        if (listEl) listEl.style.display = 'none';
+
+        fetch(API_BASE + '/subscriptions', { headers: apiHeaders() })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (data) {
+                if (!data.success) {
+                    if (hint) hint.textContent = data.message || 'Fehler beim Laden.';
+                    return;
+                }
+                if (hint) hint.style.display = 'none';
+                renderSubscriptions(data.subscriptions || [], listEl);
+            })
+            .catch(function () {
+                if (hint) hint.textContent = 'Fehler beim Laden der Abonnements.';
+            });
+    }
+
+    function renderSubscriptions(subs, listEl) {
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        var synced = window._jtSyncedIds || [];
+
+        subs.forEach(function (sub) {
+            var item = document.createElement('label');
+            item.className = 'jt-sub-item';
+
+            var cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.className = 'jt-sub-checkbox';
+            cb.dataset.channelId = sub.channelId;
+            cb.checked = synced.indexOf(sub.channelId) >= 0;
+            cb.style.flexShrink = '0';
+
+            var img = document.createElement('img');
+            img.src = sub.thumbnail || '';
+            img.alt = '';
+            img.onerror = function () { this.style.display = 'none'; };
+
+            var name = document.createElement('span');
+            name.textContent = sub.title;
+
+            item.appendChild(cb);
+            item.appendChild(img);
+            item.appendChild(name);
+            listEl.appendChild(item);
+        });
+
+        listEl.style.display = subs.length ? '' : 'none';
+        if (!subs.length) {
+            var hint = document.getElementById('jt-subs-hint');
+            if (hint) { hint.style.display = ''; hint.textContent = 'Keine Abonnements gefunden.'; }
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Sync
+    // -----------------------------------------------------------------------
+
+    function triggerSync() {
+        fetch(API_BASE + '/sync', { method: 'POST', headers: apiHeaders() })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function (data) { showToast(data.message || 'Sync gestartet.'); })
+            .catch(function () { showToast('Fehler beim Starten der Synchronisation.'); });
+    }
+
+    // -----------------------------------------------------------------------
     // Init
     // -----------------------------------------------------------------------
+
     document.getElementById('jt-save-btn').addEventListener('click', saveConfig);
-    document.getElementById('jt-test-btn').addEventListener('click', function () {
-        checkInvidious();
-        checkYtDlp();
-    });
+    document.getElementById('jt-oauth-btn').addEventListener('click', startOAuth);
+    document.getElementById('jt-oauth-revoke-btn').addEventListener('click', revokeOAuth);
+    document.getElementById('jt-load-subs-btn').addEventListener('click', loadSubscriptions);
+    document.getElementById('jt-sync-btn').addEventListener('click', triggerSync);
 
     loadConfig();
-    checkInvidious();
     checkYtDlp();
+    checkOAuthStatus();
 
 }());
