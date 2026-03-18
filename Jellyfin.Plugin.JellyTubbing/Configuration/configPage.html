@@ -60,6 +60,17 @@
             <div class="jt-section">
                 <h2>Google-Konto (Abonnements)</h2>
                 <div class="inputContainer">
+                    <label class="inputLabel">Client-Secret JSON importieren</label>
+                    <div style="display:flex; gap:0.6em; align-items:center;">
+                        <input id="jt-json-file" type="file" accept=".json" style="display:none;" />
+                        <button id="jt-json-import-btn" is="emby-button" type="button" class="raised">
+                            JSON-Datei auswaehlen
+                        </button>
+                        <span id="jt-json-status" class="jt-info" style="font-size:0.9em;"></span>
+                    </div>
+                    <div class="fieldDescription">Lade die von Google heruntergeladene <code>client_secret_*.json</code> Datei direkt hoch.</div>
+                </div>
+                <div class="inputContainer">
                     <label class="inputLabel" for="OAuthClientId">OAuth2 Client-ID</label>
                     <input id="OAuthClientId" type="text" is="emby-input" style="max-width:500px;" placeholder="...apps.googleusercontent.com" />
                 </div>

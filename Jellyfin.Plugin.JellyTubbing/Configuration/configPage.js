@@ -253,6 +253,38 @@
     // Init
     // -----------------------------------------------------------------------
 
+    // JSON import
+    document.getElementById('jt-json-import-btn').addEventListener('click', function () {
+        document.getElementById('jt-json-file').click();
+    });
+    document.getElementById('jt-json-file').addEventListener('change', function (e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+            var status = document.getElementById('jt-json-status');
+            try {
+                var json = JSON.parse(ev.target.result);
+                var creds = json.web || json.installed;
+                if (!creds || !creds.client_id || !creds.client_secret) {
+                    status.textContent = 'Keine gueltigen Credentials gefunden.';
+                    status.className = 'jt-err';
+                    return;
+                }
+                document.getElementById('OAuthClientId').value     = creds.client_id;
+                document.getElementById('OAuthClientSecret').value = creds.client_secret;
+                status.textContent = 'Importiert: ' + file.name;
+                status.className = 'jt-ok';
+            } catch (err) {
+                status.textContent = 'Fehler beim Lesen der JSON-Datei.';
+                status.className = 'jt-err';
+            }
+        };
+        reader.readAsText(file);
+        // Reset so same file can be selected again
+        e.target.value = '';
+    });
+
     document.getElementById('jt-save-btn').addEventListener('click', saveConfig);
     document.getElementById('jt-oauth-btn').addEventListener('click', startOAuth);
     document.getElementById('jt-oauth-revoke-btn').addEventListener('click', revokeOAuth);
