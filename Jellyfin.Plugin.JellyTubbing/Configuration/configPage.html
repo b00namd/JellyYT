@@ -108,10 +108,15 @@
                 <h2>Abonnements synchronisieren</h2>
                 <div class="inputContainer">
                     <label class="inputLabel" for="StrmOutputPath">STRM-Ausgabeordner</label>
-                    <input id="StrmOutputPath" type="text" is="emby-input" style="max-width:500px;"
-                           placeholder="/media/youtube" />
+                    <div style="display:flex; gap:0.5em; align-items:center;">
+                        <input id="StrmOutputPath" type="text" is="emby-input" style="max-width:440px;"
+                               placeholder="/media/youtube" />
+                        <button id="jt-browse-btn" is="emby-button" type="button" class="raised" style="flex-shrink:0;">
+                            Durchsuchen
+                        </button>
+                    </div>
                     <div class="fieldDescription">
-                        Ordner fuer STRM-/NFO-/Thumbnail-Dateien. Fuge diesen Ordner als Jellyfin-Bibliothek (Typ: Film) hinzu.
+                        Ordner auf dem Server fuer STRM-/NFO-/Thumbnail-Dateien. Fuge diesen Ordner als Jellyfin-Bibliothek (Typ: Film) hinzu.
                     </div>
                 </div>
                 <div style="display:flex; gap:0.5em; margin-bottom:0.8em; flex-wrap:wrap;">

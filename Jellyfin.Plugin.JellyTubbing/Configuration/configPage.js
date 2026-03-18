@@ -325,6 +325,18 @@
         e.target.value = '';
     });
 
+    document.getElementById('jt-browse-btn').addEventListener('click', function () {
+        require(['directorybrowser'], function (directoryBrowser) {
+            directoryBrowser.show({
+                callback: function (path) {
+                    if (path) document.getElementById('StrmOutputPath').value = path;
+                },
+                includeFiles: false,
+                header: 'STRM-Ausgabeordner waehlen'
+            });
+        });
+    });
+
     document.getElementById('jt-save-btn').addEventListener('click', saveConfig);
     document.getElementById('jt-oauth-btn').addEventListener('click', startOAuth);
     document.getElementById('jt-oauth-revoke-btn').addEventListener('click', revokeOAuth);

@@ -47,10 +47,10 @@ public class PluginConfiguration : BasePluginConfiguration
     public string[] SyncedChannelIds { get; set; } = [];
 
     /// <summary>Gets or sets how often (hours) the background sync runs.</summary>
-    public int SyncIntervalHours { get; set; } = 6;
+    public int SyncIntervalHours { get; set; } = 24;
 
     /// <summary>Gets or sets maximum number of videos to sync per channel.</summary>
-    public int MaxVideosPerChannel { get; set; } = 50;
+    public int MaxVideosPerChannel { get; set; } = 25;
 
     // -----------------------------------------------------------------------
     // Streaming / yt-dlp
