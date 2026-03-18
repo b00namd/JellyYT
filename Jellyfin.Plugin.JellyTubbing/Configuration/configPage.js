@@ -155,14 +155,21 @@
     };
 
     function startOAuth() {
-        fetch(API_BASE + '/oauth-url', { headers: apiHeaders() })
-            .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
-            .then(function (data) {
-                if (!data.success) { showToast(data.message || 'Fehler'); return; }
-                var popup = window.open(data.url, 'jtOAuth', 'width=600,height=700,noopener=0');
-                if (!popup) showToast('Popup wurde blockiert. Bitte Popup-Blocker deaktivieren.');
-            })
-            .catch(function () { showToast('Fehler beim Abrufen der OAuth-URL.'); });
+        // Save config first so JellyfinServerUrl is up to date before building the redirect URI
+        ApiClient.getPluginConfiguration(PLUGIN_ID).then(function (config) {
+            config.OAuthClientId      = document.getElementById('OAuthClientId').value.trim();
+            config.OAuthClientSecret  = document.getElementById('OAuthClientSecret').value.trim();
+            config.JellyfinServerUrl  = document.getElementById('JellyfinServerUrl').value.trim() || 'http://localhost:8096';
+            return ApiClient.updatePluginConfiguration(PLUGIN_ID, config);
+        }).then(function () {
+            return fetch(API_BASE + '/oauth-url', { headers: apiHeaders() });
+        }).then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+        .then(function (data) {
+            if (!data.success) { showToast(data.message || 'Fehler'); return; }
+            var popup = window.open(data.url, 'jtOAuth', 'width=600,height=700,noopener=0');
+            if (!popup) showToast('Popup wurde blockiert. Bitte Popup-Blocker deaktivieren.');
+        })
+        .catch(function () { showToast('Fehler beim Abrufen der OAuth-URL.'); });
     }
 
     function revokeOAuth() {
