@@ -109,6 +109,73 @@ Nach der Installation muss Jellyfin neu gestartet werden.
 
 ---
 
+## Docker Compose – Schnellstart
+
+Wer Jellyfin und Invidious noch nicht betreibt, kann mit dieser Vorlage beide Dienste starten:
+
+```yaml
+services:
+
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    network_mode: host          # einfachster Weg für DLNA / direkte Netzwerksuche
+    volumes:
+      - ./jellyfin/config:/config
+      - ./jellyfin/cache:/cache
+      - ./media:/media          # Hier landen die JellyTube-Downloads
+    environment:
+      - TZ=Europe/Berlin
+
+  invidious:
+    image: quay.io/invidious/invidious:latest
+    container_name: invidious
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      INVIDIOUS_CONFIG: |
+        db:
+          dbname: invidious
+          user: invidious
+          password: invidious
+          host: invidious-db
+          port: 5432
+        check_tables: true
+        external_port: 3000
+        domain: ""
+        https_only: false
+        statistics_enabled: false
+    depends_on:
+      - invidious-db
+
+  invidious-db:
+    image: docker.io/library/postgres:14
+    container_name: invidious-db
+    restart: unless-stopped
+    volumes:
+      - ./invidious/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: invidious
+      POSTGRES_USER: invidious
+      POSTGRES_PASSWORD: invidious
+```
+
+**Starten:**
+```bash
+docker compose up -d
+```
+
+- Jellyfin ist danach unter `http://<server-ip>:8096` erreichbar
+- Invidious läuft unter `http://<server-ip>:3000`
+- In den JellyTubbing-Einstellungen als Invidious-URL `http://invidious:3000` eintragen (Container-interner Name)
+  oder `http://<server-ip>:3000` wenn Jellyfin mit `network_mode: host` läuft
+
+> **yt-dlp und ffmpeg** sind in den offiziellen Jellyfin-Images bereits enthalten und müssen nicht separat installiert werden. Die Felder in den Plugin-Einstellungen können leer bleiben.
+
+---
+
 ## Voraussetzungen
 
 - Jellyfin 10.9.x oder neuer
