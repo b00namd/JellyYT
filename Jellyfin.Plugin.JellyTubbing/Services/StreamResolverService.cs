@@ -78,12 +78,24 @@ public class StreamResolverService
         var binary = string.IsNullOrWhiteSpace(config.YtDlpBinaryPath) ? "yt-dlp" : config.YtDlpBinaryPath;
         var height = ParseHeight(config.PreferredQuality ?? "720p");
 
-        // Try DASH first (separate video+audio → best quality), fall back to combined.
-        // yt-dlp -g prints one URL for combined, two lines for DASH (video then audio).
-        var format = $"bestvideo[height<={height}][ext=mp4]+bestaudio[ext=m4a]" +
+        // For ≤720p: use combined (muxed) streams – no ffmpeg needed, seeking works natively.
+        // For 1080p+: request DASH (separate video+audio) – yt-dlp prints two URLs,
+        //             HlsTranscodeService merges them with ffmpeg for seeking support.
+        string format;
+        if (height <= 720)
+        {
+            format = $"best[height<={height}][vcodec!=none][acodec!=none][ext=mp4]" +
+                     $"/best[height<={height}][vcodec!=none][acodec!=none]" +
+                     $"/best[vcodec!=none][acodec!=none]" +
+                     $"/best";
+        }
+        else
+        {
+            format = $"bestvideo[height<={height}][ext=mp4]+bestaudio[ext=m4a]" +
                      $"/bestvideo[height<={height}]+bestaudio" +
                      $"/best[height<={height}][vcodec!=none][acodec!=none]" +
                      $"/best";
+        }
 
         var ytUrl = $"https://www.youtube.com/watch?v={videoId}";
 
