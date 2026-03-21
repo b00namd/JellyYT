@@ -106,6 +106,17 @@ $manifestEntries += Build-Plugin `
     -Guid        "c3d4e5f6-a7b8-9012-cdef-012345678901"
 
 # ============================================================
+# Build FinSkin
+# ============================================================
+$manifestEntries += Build-Plugin `
+    -ProjectDir  (Join-Path $PSScriptRoot "Jellyfin.Plugin.FinSkin") `
+    -AssemblyName "Jellyfin.Plugin.FinSkin" `
+    -PluginName  "FinSkin" `
+    -Description "Community skin manager for Jellyfin. Load skins from the filesystem or upload your own." `
+    -Overview    "Verwalte und lade Community-Skins fuer Jellyfin." `
+    -Guid        "a4df4c37-3ef5-4d16-8b56-2f21cf2b8e3e"
+
+# ============================================================
 # Write combined manifest.json
 # ============================================================
 Write-Host ""

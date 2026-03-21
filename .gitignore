@@ -2,6 +2,9 @@
 *.ps1
 !build.ps1
 !serve.ps1
+!deploy.ps1
+!deploy-jellytubbing.ps1
+!deploy-finskin.ps1
 
 # Build output
 bin/

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/b00na/Nextcloud2/Projekte/JellyFinPlugins/**)",
+      "Bash(cp -r \"c:/Users/b00na/Nextcloud2/Projekte/FinSkinPlugin\" \"c:/Users/b00na/Nextcloud2/Projekte/JellyFinPlugins/Jellyfin.Plugin.FinSkin\")",
+      "Bash(rm -rf \"c:/Users/b00na/Nextcloud2/Projekte/JellyFinPlugins/Jellyfin.Plugin.FinSkin/bin\" \"c:/Users/b00na/Nextcloud2/Projekte/JellyFinPlugins/Jellyfin.Plugin.FinSkin/obj\")"
+    ]
+  }
+}
