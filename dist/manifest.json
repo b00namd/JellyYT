@@ -5,8 +5,8 @@
                          {
                              "changelog":  "Initiale Version",
                              "version":  "1.0.0.0",
-                             "checksum":  "4c266ef6e69fa712beb365989b8c0064",
-                             "timestamp":  "2026-03-22T10:37:54Z",
+                             "checksum":  "63e06470af370a16b19e4e85b5b7c65b",
+                             "timestamp":  "2026-03-22T21:00:38Z",
                              "targetAbi":  "10.9.0.0",
                              "sourceUrl":  "https://raw.githubusercontent.com/b00namd/JellyFinPlugins/master/dist/Jellyfin.Plugin.JellyTube_1.0.0.0.zip"
                          }
@@ -24,8 +24,8 @@
                          {
                              "changelog":  "Initiale Version",
                              "version":  "1.0.0.0",
-                             "checksum":  "0eaf7c5cb1c1c01d26c8a35282c3254e",
-                             "timestamp":  "2026-03-22T10:37:54Z",
+                             "checksum":  "bf877700b1981e8d283bceb4f9bc07e2",
+                             "timestamp":  "2026-03-22T21:00:38Z",
                              "targetAbi":  "10.9.0.0",
                              "sourceUrl":  "https://raw.githubusercontent.com/b00namd/JellyFinPlugins/master/dist/Jellyfin.Plugin.JellyTubbing_1.0.0.0.zip"
                          }
@@ -43,8 +43,8 @@
                          {
                              "changelog":  "Initiale Version",
                              "version":  "1.0.0.0",
-                             "checksum":  "a97b3ef4d58f7e3926616cd7dcb2fa8c",
-                             "timestamp":  "2026-03-22T10:37:54Z",
+                             "checksum":  "f1da6775874e2f7492a2a5a99eb5d756",
+                             "timestamp":  "2026-03-22T21:00:38Z",
                              "targetAbi":  "10.9.0.0",
                              "sourceUrl":  "https://raw.githubusercontent.com/b00namd/JellyFinPlugins/master/dist/Jellyfin.Plugin.FinSkin_1.0.0.0.zip"
                          }

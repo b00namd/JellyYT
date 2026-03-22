@@ -1,195 +1,166 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8"/>
-  <title>FinSkin</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<div id="FinSkinConfigPage" data-role="page" class="page type-interior pluginConfigurationPage">
+<style>
+  #FinSkinConfigPage *, #FinSkinConfigPage *::before, #FinSkinConfigPage *::after { box-sizing: border-box; }
 
-    :root {
-      --bg:          #0d0d0f;
-      --bg-card:     #1c1c21;
-      --bg-hover:    #242429;
-      --border:      rgba(255,255,255,0.07);
-      --accent:      #7c6af7;
-      --accent-glow: rgba(124,106,247,0.3);
-      --text:        #f0f0f5;
-      --text-muted:  #9090a0;
-      --radius:      12px;
-    }
+  #FinSkinConfigPage {
+    background: #0d0d0f;
+    color: #f0f0f5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding: 24px;
+    max-width: 900px;
+  }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      padding: 24px;
-      max-width: 900px;
-    }
+  #FinSkinConfigPage .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
 
-    /* ── Header ── */
-    .page-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 32px;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
+  #FinSkinConfigPage .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+  #FinSkinConfigPage .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #7c6af7, #5a4fd4);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px; color: #fff;
+    box-shadow: 0 4px 12px rgba(124,106,247,0.3);
+    flex-shrink: 0;
+  }
 
-    .logo-icon {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--accent), #5a4fd4);
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 14px; color: #fff;
-      box-shadow: 0 4px 12px var(--accent-glow);
-      flex-shrink: 0;
-    }
+  #FinSkinConfigPage .logo-title { font-size: 20px; font-weight: 700; }
+  #FinSkinConfigPage .logo-title span { color: #7c6af7; }
 
-    .logo-title { font-size: 20px; font-weight: 700; }
-    .logo-title span { color: var(--accent); }
+  #FinSkinConfigPage .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 16px; border-radius: 9px; font-size: 13px;
+    font-weight: 600; cursor: pointer; border: none;
+    transition: all 0.2s; text-decoration: none;
+  }
 
-    /* ── Buttons ── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 9px 16px; border-radius: 9px; font-size: 13px;
-      font-weight: 600; cursor: pointer; border: none;
-      transition: all 0.2s; text-decoration: none;
-    }
+  #FinSkinConfigPage .btn-primary {
+    background: linear-gradient(135deg, #7c6af7, #5a4fd4);
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(124,106,247,0.3);
+  }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #5a4fd4);
-      color: #fff;
-      box-shadow: 0 3px 10px var(--accent-glow);
-    }
+  #FinSkinConfigPage .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(124,106,247,0.3); }
 
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 16px var(--accent-glow); }
+  #FinSkinConfigPage .btn-ghost {
+    background: #1c1c21;
+    color: #9090a0;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
 
-    .btn-ghost {
-      background: var(--bg-card);
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
+  #FinSkinConfigPage .btn-ghost:hover { background: #242429; color: #f0f0f5; }
 
-    .btn-ghost:hover { background: var(--bg-hover); color: var(--text); }
+  #FinSkinConfigPage .btn-danger {
+    background: rgba(239,68,68,0.1);
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.2);
+  }
 
-    .btn-danger {
-      background: rgba(239,68,68,0.1);
-      color: #f87171;
-      border: 1px solid rgba(239,68,68,0.2);
-    }
+  #FinSkinConfigPage .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  #FinSkinConfigPage .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
 
-    .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  #FinSkinConfigPage .upload-zone {
+    border: 2px dashed rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 32px;
+  }
 
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+  #FinSkinConfigPage .upload-zone:hover, #FinSkinConfigPage .upload-zone.drag-over {
+    border-color: #7c6af7;
+    background: rgba(124,106,247,0.05);
+  }
 
-    /* ── Upload zone ── */
-    .upload-zone {
-      border: 2px dashed var(--border);
-      border-radius: var(--radius);
-      padding: 32px;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      margin-bottom: 32px;
-    }
+  #FinSkinConfigPage .upload-zone svg { color: #9090a0; margin-bottom: 12px; opacity: 0.5; }
+  #FinSkinConfigPage .upload-zone p { color: #9090a0; font-size: 14px; line-height: 1.6; }
+  #FinSkinConfigPage .upload-zone strong { color: #f0f0f5; }
+  #FinSkinConfigPage #fileInput { display: none; }
 
-    .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--accent);
-      background: rgba(124,106,247,0.05);
-    }
+  #FinSkinConfigPage .section-title {
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #9090a0;
+    margin-bottom: 16px;
+  }
 
-    .upload-zone svg { color: var(--text-muted); margin-bottom: 12px; opacity: 0.5; }
-    .upload-zone p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
-    .upload-zone strong { color: var(--text); }
-    #fileInput { display: none; }
+  #FinSkinConfigPage #skinGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
 
-    /* ── Section ── */
-    .section-title {
-      font-size: 13px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.08em; color: var(--text-muted);
-      margin-bottom: 16px;
-    }
+  #FinSkinConfigPage .skin-card {
+    background: #1c1c21;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex; flex-direction: column; gap: 12px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
 
-    /* ── Grid ── */
-    #skinGrid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 16px;
-    }
+  #FinSkinConfigPage .skin-card:hover { border-color: rgba(255,255,255,0.12); transform: translateY(-2px); }
 
-    /* ── Skin card ── */
-    .skin-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px;
-      display: flex; flex-direction: column; gap: 12px;
-      transition: border-color 0.2s, transform 0.2s;
-    }
+  #FinSkinConfigPage .skin-card.active {
+    border-color: #7c6af7;
+    box-shadow: 0 0 0 1px #7c6af7, 0 4px 20px rgba(124,106,247,0.3);
+  }
 
-    .skin-card:hover { border-color: rgba(255,255,255,0.12); transform: translateY(-2px); }
+  #FinSkinConfigPage .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  #FinSkinConfigPage .card-name { font-size: 15px; font-weight: 700; }
+  #FinSkinConfigPage .card-author { font-size: 12px; color: #9090a0; margin-top: 3px; }
 
-    .skin-card.active {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent), 0 4px 20px var(--accent-glow);
-    }
+  #FinSkinConfigPage .active-badge {
+    font-size: 11px; font-weight: 700;
+    background: rgba(124,106,247,0.15);
+    border: 1px solid rgba(124,106,247,0.3);
+    color: #7c6af7;
+    border-radius: 99px; padding: 2px 8px;
+    white-space: nowrap; flex-shrink: 0;
+  }
 
-    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  #FinSkinConfigPage .card-desc { font-size: 13px; color: #9090a0; line-height: 1.6; flex: 1; }
+  #FinSkinConfigPage .card-actions { display: flex; gap: 8px; }
+  #FinSkinConfigPage .card-actions .btn { flex: 1; justify-content: center; font-size: 12px; padding: 7px 10px; }
 
-    .card-name { font-size: 15px; font-weight: 700; }
-    .card-author { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  #FinSkinConfigPage .empty {
+    grid-column: 1/-1;
+    text-align: center; padding: 48px 20px;
+    color: #9090a0;
+  }
 
-    .active-badge {
-      font-size: 11px; font-weight: 700;
-      background: rgba(124,106,247,0.15);
-      border: 1px solid rgba(124,106,247,0.3);
-      color: var(--accent);
-      border-radius: 99px; padding: 2px 8px;
-      white-space: nowrap; flex-shrink: 0;
-    }
+  #FinSkinConfigPage .empty svg { opacity: 0.2; margin-bottom: 12px; }
+  #FinSkinConfigPage .empty h3 { color: #f0f0f5; margin-bottom: 6px; }
 
-    .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; flex: 1; }
+  #fs-toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: #1c1c21;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px; font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.25s ease;
+    z-index: 9999; pointer-events: none;
+  }
 
-    .card-actions { display: flex; gap: 8px; }
-    .card-actions .btn { flex: 1; justify-content: center; font-size: 12px; padding: 7px 10px; }
-
-    /* ── Empty state ── */
-    .empty {
-      grid-column: 1/-1;
-      text-align: center; padding: 48px 20px;
-      color: var(--text-muted);
-    }
-
-    .empty svg { opacity: 0.2; margin-bottom: 12px; }
-    .empty h3 { color: var(--text); margin-bottom: 6px; }
-
-    /* ── Toast ── */
-    #toast {
-      position: fixed; bottom: 24px; right: 24px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 18px;
-      font-size: 13px; font-weight: 500;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      transform: translateY(80px); opacity: 0;
-      transition: all 0.25s ease;
-      z-index: 9999; pointer-events: none;
-    }
-
-    #toast.show { transform: translateY(0); opacity: 1; }
-    #toast.success { border-color: rgba(34,197,94,0.4); color: #4ade80; }
-    #toast.error   { border-color: rgba(239,68,68,0.4);  color: #f87171; }
-  </style>
-</head>
-<body>
+  #fs-toast.show { transform: translateY(0); opacity: 1; }
+  #fs-toast.success { border-color: rgba(34,197,94,0.4); color: #4ade80; }
+  #fs-toast.error   { border-color: rgba(239,68,68,0.4);  color: #f87171; }
+</style>
 
 <div class="page-header">
   <div class="logo">
@@ -204,7 +175,6 @@
   </label>
 </div>
 
-<!-- Upload zone -->
 <div class="upload-zone" id="dropZone">
   <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" display="block" style="margin:0 auto">
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -216,7 +186,6 @@
 </div>
 <input type="file" id="fileInput" accept=".css" />
 
-<!-- Skin list -->
 <div class="section-title">Installed Skins</div>
 <div id="skinGrid">
   <div class="empty">
@@ -225,135 +194,112 @@
   </div>
 </div>
 
-<div id="toast"></div>
+<div id="fs-toast"></div>
 
 <script>
-  const BASE = window.location.origin;
+  (function () {
+    const BASE = window.location.origin;
 
-  function getHeaders(json) {
-    const creds = JSON.parse(localStorage.getItem('jellyfin_credentials') || '{"Servers":[]}');
-    const token = creds.Servers?.[0]?.AccessToken ?? '';
-    const h = { 'X-Emby-Token': token };
-    if (json) h['Content-Type'] = 'application/json';
-    return h;
-  }
-
-  async function api(method, path, body) {
-    const opts = { method, headers: getHeaders(!(body instanceof FormData)) };
-    if (body) opts.body = body instanceof FormData ? body : JSON.stringify(body);
-    const res = await fetch(BASE + '/Plugins/FinSkin/' + path, opts);
-    if (!res.ok) throw new Error(await res.text());
-    return res.status === 204 ? null : res.json().catch(() => null);
-  }
-
-  // ── Toast ──
-  let toastTimer;
-  function toast(msg, type = 'success') {
-    const el = document.getElementById('toast');
-    el.textContent = msg;
-    el.className = `show ${type}`;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
-  }
-
-  // ── Render ──
-  function render(skins) {
-    const grid = document.getElementById('skinGrid');
-    if (!skins.length) {
-      grid.innerHTML = `
-        <div class="empty">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:block;margin:0 auto"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
-          <h3>No skins installed</h3>
-          <p>Upload a .css file to get started.</p>
-        </div>`;
-      return;
+    function getHeaders(json) {
+      const creds = JSON.parse(localStorage.getItem('jellyfin_credentials') || '{"Servers":[]}');
+      const token = creds.Servers?.[0]?.AccessToken ?? '';
+      const h = { 'X-Emby-Token': token };
+      if (json) h['Content-Type'] = 'application/json';
+      return h;
     }
 
-    grid.innerHTML = skins.map(s => `
-      <div class="skin-card ${s.isActive ? 'active' : ''}" data-file="${s.fileName}">
-        <div class="card-top">
-          <div>
-            <div class="card-name">${s.name}</div>
-            ${s.author ? `<div class="card-author">by ${s.author}</div>` : ''}
-          </div>
-          ${s.isActive ? '<span class="active-badge">Active</span>' : ''}
-        </div>
-        ${s.description ? `<p class="card-desc">${s.description}</p>` : ''}
-        <div class="card-actions">
-          ${s.isActive
-            ? `<button class="btn btn-ghost" onclick="deactivate()">Deactivate</button>`
-            : `<button class="btn btn-primary" onclick="activate('${s.fileName}')">Activate</button>`
-          }
-          <button class="btn btn-danger" onclick="deleteSkin('${s.fileName}', '${s.name}')">Delete</button>
-        </div>
-      </div>`).join('');
-  }
-
-  async function loadSkins() {
-    try {
-      const skins = await api('GET', 'Skins');
-      render(skins);
-    } catch (e) {
-      document.getElementById('skinGrid').innerHTML = `
-        <div class="empty"><h3>Error loading skins</h3><p>${e.message}</p></div>`;
+    async function api(method, path, body) {
+      const opts = { method, headers: getHeaders(!(body instanceof FormData)) };
+      if (body) opts.body = body instanceof FormData ? body : JSON.stringify(body);
+      const res = await fetch(BASE + '/Plugins/FinSkin/' + path, opts);
+      if (!res.ok) throw new Error(await res.text());
+      return res.status === 204 ? null : res.json().catch(() => null);
     }
-  }
 
-  // ── Actions ──
-  async function activate(fileName) {
-    try {
-      await api('POST', `Activate/${fileName}`);
-      toast(`Activated "${fileName}"`);
-      loadSkins();
-    } catch (e) { toast(e.message, 'error'); }
-  }
+    let toastTimer;
+    function toast(msg, type) {
+      const el = document.getElementById('fs-toast');
+      el.textContent = msg;
+      el.className = 'show ' + (type || 'success');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+    }
 
-  async function deactivate() {
-    try {
-      await api('POST', 'Deactivate');
-      toast('Skin deactivated');
-      loadSkins();
-    } catch (e) { toast(e.message, 'error'); }
-  }
+    function render(skins) {
+      const grid = document.getElementById('skinGrid');
+      if (!skins.length) {
+        grid.innerHTML = '<div class="empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="display:block;margin:0 auto"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg><h3>No skins installed</h3><p>Upload a .css file to get started.</p></div>';
+        return;
+      }
+      grid.innerHTML = skins.map(function(s) {
+        return '<div class="skin-card ' + (s.isActive ? 'active' : '') + '" data-file="' + s.fileName + '">' +
+          '<div class="card-top"><div><div class="card-name">' + s.name + '</div>' +
+          (s.author ? '<div class="card-author">by ' + s.author + '</div>' : '') +
+          '</div>' + (s.isActive ? '<span class="active-badge">Active</span>' : '') + '</div>' +
+          (s.description ? '<p class="card-desc">' + s.description + '</p>' : '') +
+          '<div class="card-actions">' +
+          (s.isActive
+            ? '<button class="btn btn-ghost" onclick="fsDeactivate()">Deactivate</button>'
+            : '<button class="btn btn-primary" onclick="fsActivate(\'' + s.fileName + '\')">Activate</button>') +
+          '<button class="btn btn-danger" onclick="fsDeleteSkin(\'' + s.fileName + '\',\'' + s.name + '\')">Delete</button>' +
+          '</div></div>';
+      }).join('');
+    }
 
-  async function deleteSkin(fileName, name) {
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
-    try {
-      await api('DELETE', `Skin/${fileName}`);
-      toast(`Deleted "${name}"`);
-      loadSkins();
-    } catch (e) { toast(e.message, 'error'); }
-  }
+    async function loadSkins() {
+      try {
+        const skins = await api('GET', 'Skins');
+        render(skins);
+      } catch (e) {
+        document.getElementById('skinGrid').innerHTML = '<div class="empty"><h3>Error loading skins</h3><p>' + e.message + '</p></div>';
+      }
+    }
 
-  // ── Upload ──
-  async function uploadFile(file) {
-    if (!file.name.endsWith('.css')) { toast('Only .css files allowed', 'error'); return; }
-    const form = new FormData();
-    form.append('file', file);
-    try {
-      const skin = await api('POST', 'Upload', form);
-      toast(`Uploaded "${skin.name}"`);
-      loadSkins();
-    } catch (e) { toast(e.message, 'error'); }
-  }
+    window.fsActivate = async function(fileName) {
+      try { await api('POST', 'Activate/' + fileName); toast('Activated "' + fileName + '"'); loadSkins(); }
+      catch (e) { toast(e.message, 'error'); }
+    };
 
-  document.getElementById('fileInput').addEventListener('change', e => {
-    if (e.target.files[0]) uploadFile(e.target.files[0]);
-    e.target.value = '';
-  });
+    window.fsDeactivate = async function() {
+      try { await api('POST', 'Deactivate'); toast('Skin deactivated'); loadSkins(); }
+      catch (e) { toast(e.message, 'error'); }
+    };
 
-  const zone = document.getElementById('dropZone');
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-  zone.addEventListener('drop', e => {
-    e.preventDefault();
-    zone.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file) uploadFile(file);
-  });
-  zone.addEventListener('click', () => document.getElementById('fileInput').click());
+    window.fsDeleteSkin = async function(fileName, name) {
+      if (!confirm('Delete "' + name + '"? This cannot be undone.')) return;
+      try { await api('DELETE', 'Skin/' + fileName); toast('Deleted "' + name + '"'); loadSkins(); }
+      catch (e) { toast(e.message, 'error'); }
+    };
 
-  loadSkins();
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      if (!file.name.endsWith('.css')) { toast('Only .css files allowed', 'error'); return; }
+      var form = new FormData();
+      form.append('file', file);
+      api('POST', 'Upload', form)
+        .then(function(skin) { toast('Uploaded "' + skin.name + '"'); loadSkins(); })
+        .catch(function(e) { toast(e.message, 'error'); });
+      e.target.value = '';
+    });
+
+    var zone = document.getElementById('dropZone');
+    zone.addEventListener('dragover', function(e) { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', function() { zone.classList.remove('drag-over'); });
+    zone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      var file = e.dataTransfer.files[0];
+      if (!file || !file.name.endsWith('.css')) { toast('Only .css files allowed', 'error'); return; }
+      var form = new FormData();
+      form.append('file', file);
+      api('POST', 'Upload', form)
+        .then(function(skin) { toast('Uploaded "' + skin.name + '"'); loadSkins(); })
+        .catch(function(e) { toast(e.message, 'error'); });
+    });
+    zone.addEventListener('click', function() { document.getElementById('fileInput').click(); });
+
+    loadSkins();
+  })();
 </script>
-</body>
-</html>
+</div>
