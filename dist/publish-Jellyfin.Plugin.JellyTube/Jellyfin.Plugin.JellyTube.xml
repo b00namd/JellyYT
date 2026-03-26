@@ -551,6 +551,12 @@
             <param name="meta">Video metadata.</param>
             <param name="overrideBasePath">Optional base path override. Falls back to the global DownloadPath when null or empty.</param>
         </member>
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.LibraryOrganizationService.GetPlaylistDirectory(System.String)">
+            <summary>
+            Returns the base directory for a playlist download (no metadata available yet).
+            </summary>
+            <param name="overrideBasePath">Optional base path override.</param>
+        </member>
         <member name="M:Jellyfin.Plugin.JellyTube.Services.LibraryOrganizationService.GetNfoPath(System.String)">
             <summary>
             Returns the .nfo file path that corresponds to a given video file path.
@@ -638,7 +644,7 @@
             Downloads a single video to the specified output directory.
             </summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTube.Services.YtDlpService.DownloadPlaylistAsync(System.String,System.String,System.IProgress{YoutubeDLSharp.DownloadProgress},System.Threading.CancellationToken,System.String,System.Int32)">
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.YtDlpService.DownloadPlaylistAsync(System.String,System.String,System.IProgress{YoutubeDLSharp.DownloadProgress},System.Threading.CancellationToken,System.String,System.Int32,System.Boolean)">
             <summary>
             Downloads all videos in a playlist to the specified output directory.
             </summary>

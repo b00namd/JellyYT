@@ -3,8 +3,8 @@
 
 param(
     [string]$Version = "1.0.0.0",
-    [string]$BaseUrl = "https://raw.githubusercontent.com/b00namd/JellyYT/master/dist",
-    [string]$RepoUrl = "https://raw.githubusercontent.com/b00namd/JellyYT/master"
+    [string]$BaseUrl = "https://raw.githubusercontent.com/b00namd/JellyFinPlugins/master/dist",
+    [string]$RepoUrl = "https://raw.githubusercontent.com/b00namd/JellyFinPlugins/master"
 )
 
 $ErrorActionPreference = "Stop"

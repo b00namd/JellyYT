@@ -79,11 +79,9 @@ public class StreamResolverService
         var binary = string.IsNullOrWhiteSpace(config.YtDlpBinaryPath) ? "yt-dlp" : config.YtDlpBinaryPath;
         var height = ParseHeight(config.PreferredQuality ?? "720p");
 
-        // Try combined (muxed) stream first – one URL, no ffmpeg, seeking works natively.
-        // Fall back to DASH (two URLs) → HlsTranscodeService merges with ffmpeg for seeking.
-        // The "best[height<=N]" selector picks the best combined format up to N pixels tall
-        // (YouTube offers combined up to ~360p; DASH covers 720p/1080p/4K).
-        var format = $"best[height<={height}]/bestvideo[height<={height}]+bestaudio/best";
+        // DASH first (bestvideo+bestaudio) for best quality – HlsTranscodeService merges with ffmpeg.
+        // Fall back to combined (muxed) stream – YouTube only offers these up to ~360p.
+        var format = $"bestvideo[height<={height}]+bestaudio/best[height<={height}]/best";
 
         var ytUrl = $"https://www.youtube.com/watch?v={videoId}";
 
@@ -100,6 +98,8 @@ public class StreamResolverService
             psi.ArgumentList.Add("-g");
             psi.ArgumentList.Add("--no-warnings");
             psi.ArgumentList.Add("--no-playlist");
+            psi.ArgumentList.Add("--extractor-args");
+            psi.ArgumentList.Add("youtube:player_client=tv_embedded,web");
             psi.ArgumentList.Add("--format");
             psi.ArgumentList.Add(format);
             psi.ArgumentList.Add("--");
