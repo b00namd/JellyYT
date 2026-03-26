@@ -36,7 +36,8 @@
             document.getElementById('OAuthClientSecret').value  = config.OAuthClientSecret || '';
             document.getElementById('StrmOutputPath').value     = config.StrmOutputPath || '';
             document.getElementById('MaxVideosPerChannel').value = config.MaxVideosPerChannel || 25;
-            document.getElementById('IncludeShorts').checked     = !!config.IncludeShorts;
+            document.getElementById('IncludeShorts').checked        = !!config.IncludeShorts;
+            document.getElementById('DeleteWatchedStrm').checked    = !!config.DeleteWatchedStrm;
             document.getElementById('YtDlpBinaryPath').value    = config.YtDlpBinaryPath || '';
             document.getElementById('FfmpegBinaryPath').value   = config.FfmpegBinaryPath || '';
             document.getElementById('PreferredQuality').value   = config.PreferredQuality || '720p';
@@ -56,6 +57,7 @@
             config.StrmOutputPath      = document.getElementById('StrmOutputPath').value.trim();
             config.MaxVideosPerChannel = parseInt(document.getElementById('MaxVideosPerChannel').value, 10) || 25;
             config.IncludeShorts       = document.getElementById('IncludeShorts').checked;
+            config.DeleteWatchedStrm   = document.getElementById('DeleteWatchedStrm').checked;
             config.YtDlpBinaryPath     = document.getElementById('YtDlpBinaryPath').value.trim();
             config.FfmpegBinaryPath    = document.getElementById('FfmpegBinaryPath').value.trim();
             config.PreferredQuality    = document.getElementById('PreferredQuality').value;
@@ -301,6 +303,7 @@
             config.StrmOutputPath      = document.getElementById('StrmOutputPath').value.trim();
             config.MaxVideosPerChannel = parseInt(document.getElementById('MaxVideosPerChannel').value, 10) || 25;
             config.IncludeShorts       = document.getElementById('IncludeShorts').checked;
+            config.DeleteWatchedStrm   = document.getElementById('DeleteWatchedStrm').checked;
             config.YtDlpBinaryPath     = document.getElementById('YtDlpBinaryPath').value.trim();
             config.FfmpegBinaryPath    = document.getElementById('FfmpegBinaryPath').value.trim();
             config.PreferredQuality    = document.getElementById('PreferredQuality').value;

@@ -52,6 +52,9 @@ public class PluginConfiguration : BasePluginConfiguration
     /// <summary>Gets or sets whether YouTube Shorts (≤ 120 s) are included in the sync.</summary>
     public bool IncludeShorts { get; set; } = false;
 
+    /// <summary>Gets or sets whether STRM files are deleted after being watched.</summary>
+    public bool DeleteWatchedStrm { get; set; } = false;
+
     // -----------------------------------------------------------------------
     // Streaming / yt-dlp
     // -----------------------------------------------------------------------

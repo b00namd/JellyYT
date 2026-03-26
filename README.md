@@ -71,13 +71,14 @@ Stream-URLs werden bei jedem Abspielen frisch über [yt-dlp](https://github.com/
 - Kategorien: Trending, Musik, Gaming, Nachrichten, Filme
 - Abonnierte YouTube-Kanäle mit Google-Konto verbinden und als Jellyfin-Bibliothek synchronisieren
 - **Jellyfin-Bibliothek wird beim ersten Sync automatisch angelegt** – kein manuelles Einrichten nötig
-- YouTube Shorts (≤ 60 s) werden standardmäßig nicht synchronisiert (optional aktivierbar)
+- YouTube Shorts (≤ 120 s) werden standardmäßig nicht synchronisiert (optional aktivierbar)
 - Sync-Zeitplan über **Geplante Aufgaben → JellyTubbing → Kanal-Synchronisation** konfigurierbar (Standard: alle 24 h)
 - Manueller Sync-Trigger direkt im Plugin (speichert Einstellungen automatisch)
 - Google-Verbindung per Device Authorization Grant – kein Redirect-URI, kein öffentlicher Server nötig
 - Client-Secret-JSON aus der Google Cloud Console direkt importieren
 - yt-dlp-Verfügbarkeitscheck in den Einstellungen
-- Stream-Qualität konfigurierbar (360p–1080p)
+- Stream-Qualität konfigurierbar (360p – 4K)
+- Gesehene Videos automatisch löschen (STRM + NFO + Thumbnail)
 
 ### Einstellungen
 
@@ -87,9 +88,10 @@ Stream-URLs werden bei jedem Abspielen frisch über [yt-dlp](https://github.com/
 | OAuth2 Client-ID / Secret | Erforderlich für Abo-Synchronisation |
 | STRM-Ausgabeordner | Zielordner auf dem Server für `.strm`-, `.nfo`- und Thumbnail-Dateien |
 | Max. Videos pro Kanal | Wie viele Videos pro Kanal beim Sync geholt werden (Standard: 25) |
-| YouTube Shorts einschließen | Shorts (≤ 60 s) beim Sync berücksichtigen (Standard: aus) |
+| YouTube Shorts einschließen | Shorts (≤ 120 s) beim Sync berücksichtigen (Standard: aus) |
+| Gesehene Videos löschen | STRM + NFO + Thumbnail nach dem Schauen automatisch löschen |
 | yt-dlp Programmpfad | Optional – leer lassen wenn yt-dlp im PATH liegt |
-| Bevorzugte Qualität | Stream-Auflösung (360p, 480p, 720p, 1080p) |
+| Bevorzugte Qualität | Stream-Auflösung (360p, 480p, 720p, 1080p, 2K, 4K) |
 | Trending-Region | Land für Trending-Videos im JellyTrending-Kanal (z. B. DE, US, GB) |
 
 ---
@@ -162,7 +164,7 @@ In Jellyfin:
 
 Repository-URL:
 ```
-https://raw.githubusercontent.com/b00namd/JellyYT/master/dist/manifest.json
+https://raw.githubusercontent.com/b00namd/JellyFinPlugins/master/dist/manifest.json
 ```
 
 ### 2. Plugins installieren

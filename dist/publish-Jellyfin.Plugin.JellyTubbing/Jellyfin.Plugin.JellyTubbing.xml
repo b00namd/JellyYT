@@ -142,6 +142,9 @@
         <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.IncludeShorts">
             <summary>Gets or sets whether YouTube Shorts (≤ 120 s) are included in the sync.</summary>
         </member>
+        <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.DeleteWatchedStrm">
+            <summary>Gets or sets whether STRM files are deleted after being watched.</summary>
+        </member>
         <member name="P:Jellyfin.Plugin.JellyTubbing.Configuration.PluginConfiguration.YtDlpBinaryPath">
             <summary>Gets or sets the optional path to the yt-dlp binary.</summary>
         </member>
@@ -362,6 +365,23 @@
             <summary>
             Creates .strm / .nfo / thumbnail for a single video if they do not already exist.
             </summary>
+        </member>
+        <member name="T:Jellyfin.Plugin.JellyTubbing.Services.WatchedStrmCleanupService">
+            <summary>
+            Listens for Jellyfin playback events and deletes watched STRM files
+            (plus their .nfo and thumbnail sidecars) when DeleteWatchedStrm is enabled.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.WatchedStrmCleanupService.#ctor(MediaBrowser.Controller.Library.IUserDataManager,MediaBrowser.Controller.Library.ILibraryManager,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTubbing.Services.WatchedStrmCleanupService})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTubbing.Services.WatchedStrmCleanupService"/> class.
+            </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.WatchedStrmCleanupService.StartAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.WatchedStrmCleanupService.StopAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Jellyfin.Plugin.JellyTubbing.Services.YouTubeApiService">
             <summary>

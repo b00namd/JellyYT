@@ -27,5 +27,6 @@ public class ServiceRegistrator : IPluginServiceRegistrator
 
         serviceCollection.AddSingleton<IChannel, JellyTubbingChannel>();
         serviceCollection.AddSingleton<IScheduledTask>(sp => sp.GetRequiredService<ChannelSyncTask>());
+        serviceCollection.AddHostedService<WatchedStrmCleanupService>();
     }
 }
