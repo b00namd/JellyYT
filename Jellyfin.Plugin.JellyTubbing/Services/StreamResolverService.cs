@@ -79,9 +79,12 @@ public class StreamResolverService
         var binary = string.IsNullOrWhiteSpace(config.YtDlpBinaryPath) ? "yt-dlp" : config.YtDlpBinaryPath;
         var height = ParseHeight(config.PreferredQuality ?? "720p");
 
-        // DASH first (bestvideo+bestaudio) for best quality – HlsTranscodeService merges with ffmpeg.
-        // Fall back to combined (muxed) stream – YouTube only offers these up to ~360p.
-        var format = $"bestvideo[height<={height}]+bestaudio/best[height<={height}]/best";
+        // Prefer H.264 (avc1) + AAC so the TS container is fully supported.
+        // Fall back to any video+audio DASH, then combined muxed stream.
+        var format = $"bestvideo[height<={height}][vcodec^=avc1]+bestaudio[ext=m4a]" +
+                     $"/bestvideo[height<={height}][vcodec^=avc1]+bestaudio" +
+                     $"/bestvideo[height<={height}]+bestaudio" +
+                     $"/best[height<={height}]/best";
 
         var ytUrl = $"https://www.youtube.com/watch?v={videoId}";
 
@@ -164,6 +167,10 @@ public class StreamResolverService
         IsInfiniteStream     = false,
         Type                 = MediaSourceType.Default,
     };
+
+    /// <summary>Returns the configured max height from plugin settings.</summary>
+    public int ParseConfigHeight() =>
+        ParseHeight(Plugin.Instance?.Configuration.PreferredQuality ?? "720p");
 
     private static int ParseHeight(string q) =>
         int.TryParse(q.TrimEnd('p', 'P'), out var h) ? h : 720;

@@ -39,7 +39,9 @@ public sealed class HlsTranscodeService : IDisposable
         PruneOldSessions();
 
         var config  = Plugin.Instance!.Configuration;
-        var ffmpeg  = string.IsNullOrWhiteSpace(config.FfmpegBinaryPath) ? "ffmpeg" : config.FfmpegBinaryPath;
+        var ffmpeg  = string.IsNullOrWhiteSpace(config.FfmpegBinaryPath)
+            ? (File.Exists("/usr/lib/jellyfin-ffmpeg/ffmpeg") ? "/usr/lib/jellyfin-ffmpeg/ffmpeg" : "ffmpeg")
+            : config.FfmpegBinaryPath;
 
         var session = _sessions.GetOrAdd(
             videoId,
@@ -48,11 +50,19 @@ public sealed class HlsTranscodeService : IDisposable
         return await session.WaitReadyAsync(ct);
     }
 
-    /// <summary>Returns the full path to a playlist or segment file, or null if not found.</summary>
-    public string? GetFilePath(string videoId, string fileName)
+    /// <summary>
+    /// Returns the full path to a segment file, waiting up to 15 s for it to appear.
+    /// Returns null if the session is unknown or the file does not appear in time.
+    /// </summary>
+    public async Task<string?> GetFilePathAsync(string videoId, string fileName, CancellationToken ct)
     {
         if (!_sessions.TryGetValue(videoId, out var session)) return null;
         var path = Path.Combine(session.TempDir, SanitizeFileName(fileName));
+
+        var deadline = DateTime.UtcNow.AddSeconds(15);
+        while (!File.Exists(path) && DateTime.UtcNow < deadline && !ct.IsCancellationRequested)
+            await Task.Delay(200, ct);
+
         return File.Exists(path) ? path : null;
     }
 
@@ -113,17 +123,17 @@ internal sealed class HlsSession : IDisposable
         Directory.CreateDirectory(TempDir);
     }
 
-    /// <summary>Starts ffmpeg (once) and waits until the first segment is on disk.</summary>
+    /// <summary>Starts ffmpeg (once) and waits until at least 2 segments are on disk (playback buffer).</summary>
     public async Task<string?> WaitReadyAsync(CancellationToken ct)
     {
         if (Interlocked.Exchange(ref _startFlag, 1) == 0)
             StartFfmpeg();
 
-        var deadline = DateTime.UtcNow.AddSeconds(30);
+        var deadline = DateTime.UtcNow.AddSeconds(60);
         while (DateTime.UtcNow < deadline && !ct.IsCancellationRequested)
         {
             if (File.Exists(_playlistPath) &&
-                Directory.GetFiles(TempDir, "*.ts").Length >= 1)
+                Directory.GetFiles(TempDir, "*.ts").Length >= 2)
                 return _playlistPath;
 
             await Task.Delay(300, ct);
@@ -150,7 +160,8 @@ internal sealed class HlsSession : IDisposable
         psi.ArgumentList.Add("-i");                  psi.ArgumentList.Add(_videoUrl);
         psi.ArgumentList.Add("-i");                  psi.ArgumentList.Add(_audioUrl);
         psi.ArgumentList.Add("-c:v");                psi.ArgumentList.Add("copy");
-        psi.ArgumentList.Add("-c:a");                psi.ArgumentList.Add("copy");
+        psi.ArgumentList.Add("-c:a");                psi.ArgumentList.Add("aac");
+        psi.ArgumentList.Add("-b:a");                psi.ArgumentList.Add("192k");
         psi.ArgumentList.Add("-f");                  psi.ArgumentList.Add("hls");
         psi.ArgumentList.Add("-hls_time");           psi.ArgumentList.Add("6");
         psi.ArgumentList.Add("-hls_list_size");      psi.ArgumentList.Add("0");

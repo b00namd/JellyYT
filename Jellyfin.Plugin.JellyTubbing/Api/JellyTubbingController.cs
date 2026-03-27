@@ -192,11 +192,12 @@ public class JellyTubbingController : ControllerBase
 
     /// <summary>
     /// Resolves a YouTube video and delivers it to the client.
-    /// Combined streams (≤720p): 302 redirect to YouTube CDN (seeking works).
-    /// DASH streams (1080p+): 302 redirect to our HLS endpoint (seeking works via segments).
+    /// Combined streams: 302 redirect to YouTube CDN.
+    /// DASH streams: ffmpeg merges video+audio CDN URLs and pipes fragmented MP4.
     /// </summary>
     [HttpGet("stream/{videoId}")]
     [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status302Found)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> StreamVideo(string videoId, CancellationToken ct)
@@ -206,12 +207,45 @@ public class JellyTubbingController : ControllerBase
         if (string.IsNullOrEmpty(videoUrl))
             return NotFound(new { message = $"Stream fuer {videoId} konnte nicht aufgeloest werden." });
 
-        // Combined stream: direct redirect – seeking fully supported
+        // Combined stream: direct redirect to YouTube CDN
         if (string.IsNullOrEmpty(audioUrl))
             return Redirect(videoUrl);
 
-        // DASH: redirect to HLS endpoint which segments video+audio (requires ffmpeg)
-        return Redirect($"/api/jellytubbing/hls/{videoId}/index.m3u8");
+        // DASH: merge the already-resolved CDN URLs with ffmpeg → fragmented MP4
+        var config = Plugin.Instance!.Configuration;
+        var ffmpegBin = string.IsNullOrWhiteSpace(config.FfmpegBinaryPath)
+            ? (System.IO.File.Exists("/usr/lib/jellyfin-ffmpeg/ffmpeg") ? "/usr/lib/jellyfin-ffmpeg/ffmpeg" : "ffmpeg")
+            : config.FfmpegBinaryPath;
+
+        var psi = new ProcessStartInfo
+        {
+            FileName               = ffmpegBin,
+            RedirectStandardOutput = true,
+            RedirectStandardError  = true,
+            UseShellExecute        = false,
+            CreateNoWindow         = true,
+        };
+        psi.ArgumentList.Add("-hide_banner");
+        psi.ArgumentList.Add("-loglevel");           psi.ArgumentList.Add("error");
+        psi.ArgumentList.Add("-i");                  psi.ArgumentList.Add(videoUrl);
+        psi.ArgumentList.Add("-i");                  psi.ArgumentList.Add(audioUrl);
+        psi.ArgumentList.Add("-c:v");                psi.ArgumentList.Add("copy");
+        psi.ArgumentList.Add("-c:a");                psi.ArgumentList.Add("aac");
+        psi.ArgumentList.Add("-b:a");                psi.ArgumentList.Add("192k");
+        psi.ArgumentList.Add("-f");                  psi.ArgumentList.Add("mpegts");
+        psi.ArgumentList.Add("pipe:1");
+
+        var proc = new Process { StartInfo = psi };
+        proc.Start();
+
+        ct.Register(() =>
+        {
+            try { if (!proc.HasExited) proc.Kill(); } catch { /* ignored */ }
+            proc.Dispose();
+        });
+
+        Response.Headers["X-Accel-Buffering"] = "no";
+        return new FileStreamResult(proc.StandardOutput.BaseStream, "video/mp2t");
     }
 
     // -----------------------------------------------------------------------
@@ -244,14 +278,14 @@ public class JellyTubbingController : ControllerBase
         return Content(content, "application/vnd.apple.mpegurl");
     }
 
-    /// <summary>Serves an individual HLS segment (.ts file).</summary>
+    /// <summary>Serves an individual HLS segment (.ts file), waiting up to 15 s for it to be written.</summary>
     [HttpGet("hls/{videoId}/{segment}")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetHlsSegment(string videoId, string segment)
+    public async Task<IActionResult> GetHlsSegment(string videoId, string segment, CancellationToken ct)
     {
-        var path = _hls.GetFilePath(videoId, segment);
+        var path = await _hls.GetFilePathAsync(videoId, segment, ct);
         if (path is null)
             return NotFound();
 

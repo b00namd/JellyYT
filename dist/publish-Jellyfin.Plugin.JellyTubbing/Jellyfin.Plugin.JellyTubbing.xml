@@ -47,8 +47,8 @@
         <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.StreamVideo(System.String,System.Threading.CancellationToken)">
             <summary>
             Resolves a YouTube video and delivers it to the client.
-            Combined streams (≤720p): 302 redirect to YouTube CDN (seeking works).
-            DASH streams (1080p+): 302 redirect to our HLS endpoint (seeking works via segments).
+            Combined streams: 302 redirect to YouTube CDN.
+            DASH streams: ffmpeg merges video+audio CDN URLs and pipes fragmented MP4.
             </summary>
         </member>
         <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.GetHlsPlaylist(System.String,System.Threading.CancellationToken)">
@@ -57,8 +57,8 @@
             Starts ffmpeg transcoding in the background if not already running.
             </summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.GetHlsSegment(System.String,System.String)">
-            <summary>Serves an individual HLS segment (.ts file).</summary>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Api.JellyTubbingController.GetHlsSegment(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>Serves an individual HLS segment (.ts file), waiting up to 15 s for it to be written.</summary>
         </member>
         <member name="T:Jellyfin.Plugin.JellyTubbing.Channel.JellyTubbingChannel">
             <summary>
@@ -289,14 +289,17 @@
             Returns the path to the M3U8 playlist file, or null on timeout/error.
             </summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.HlsTranscodeService.GetFilePath(System.String,System.String)">
-            <summary>Returns the full path to a playlist or segment file, or null if not found.</summary>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.HlsTranscodeService.GetFilePathAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Returns the full path to a segment file, waiting up to 15 s for it to appear.
+            Returns null if the session is unknown or the file does not appear in time.
+            </summary>
         </member>
         <member name="M:Jellyfin.Plugin.JellyTubbing.Services.HlsTranscodeService.Dispose">
             <inheritdoc />
         </member>
         <member name="M:Jellyfin.Plugin.JellyTubbing.Services.HlsSession.WaitReadyAsync(System.Threading.CancellationToken)">
-            <summary>Starts ffmpeg (once) and waits until the first segment is on disk.</summary>
+            <summary>Starts ffmpeg (once) and waits until at least 2 segments are on disk (playback buffer).</summary>
         </member>
         <member name="T:Jellyfin.Plugin.JellyTubbing.Services.OAuthService">
             <summary>
@@ -350,6 +353,9 @@
             Returns cached or freshly resolved stream URLs.
             For combined streams: Audio is null. For DASH (1080p+): both Video and Audio are set.
             </summary>
+        </member>
+        <member name="M:Jellyfin.Plugin.JellyTubbing.Services.StreamResolverService.ParseConfigHeight">
+            <summary>Returns the configured max height from plugin settings.</summary>
         </member>
         <member name="T:Jellyfin.Plugin.JellyTubbing.Services.StrmService">
             <summary>
