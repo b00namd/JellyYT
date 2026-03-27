@@ -7,6 +7,7 @@
     color: #f0f0f5;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     padding: 24px;
+    padding-top: 64px;
     max-width: 900px;
   }
 
@@ -69,6 +70,7 @@
 
   #FinSkinConfigPage .btn-danger:hover { background: rgba(239,68,68,0.2); }
   #FinSkinConfigPage .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+  #FinSkinConfigPage .btn > * { pointer-events: none; }
 
   #FinSkinConfigPage .upload-zone {
     border: 2px dashed rgba(255,255,255,0.07);
@@ -201,8 +203,13 @@
     const BASE = window.location.origin;
 
     function getHeaders(json) {
-      const creds = JSON.parse(localStorage.getItem('jellyfin_credentials') || '{"Servers":[]}');
-      const token = creds.Servers?.[0]?.AccessToken ?? '';
+      const token = (window.ApiClient && window.ApiClient.accessToken())
+        || (function() {
+          try {
+            const creds = JSON.parse(localStorage.getItem('jellyfin_credentials') || '{"Servers":[]}');
+            return creds.Servers?.[0]?.AccessToken ?? '';
+          } catch(e) { return ''; }
+        })();
       const h = { 'X-Emby-Token': token };
       if (json) h['Content-Type'] = 'application/json';
       return h;
@@ -232,16 +239,21 @@
         return;
       }
       grid.innerHTML = skins.map(function(s) {
-        return '<div class="skin-card ' + (s.isActive ? 'active' : '') + '" data-file="' + s.fileName + '">' +
-          '<div class="card-top"><div><div class="card-name">' + s.name + '</div>' +
-          (s.author ? '<div class="card-author">by ' + s.author + '</div>' : '') +
-          '</div>' + (s.isActive ? '<span class="active-badge">Active</span>' : '') + '</div>' +
-          (s.description ? '<p class="card-desc">' + s.description + '</p>' : '') +
+        var name     = s.Name     || s.name     || s.FileName || s.fileName || '?';
+        var fileName = s.FileName || s.fileName || '';
+        var author   = s.Author   || s.author   || '';
+        var desc     = s.Description || s.description || '';
+        var active   = s.IsActive || s.isActive || false;
+        return '<div class="skin-card ' + (active ? 'active' : '') + '" data-file="' + fileName + '">' +
+          '<div class="card-top"><div><div class="card-name">' + name + '</div>' +
+          (author ? '<div class="card-author">by ' + author + '</div>' : '') +
+          '</div>' + (active ? '<span class="active-badge">Active</span>' : '') + '</div>' +
+          (desc ? '<p class="card-desc">' + desc + '</p>' : '') +
           '<div class="card-actions">' +
-          (s.isActive
+          (active
             ? '<button class="btn btn-ghost" onclick="fsDeactivate()">Deactivate</button>'
-            : '<button class="btn btn-primary" onclick="fsActivate(\'' + s.fileName + '\')">Activate</button>') +
-          '<button class="btn btn-danger" onclick="fsDeleteSkin(\'' + s.fileName + '\',\'' + s.name + '\')">Delete</button>' +
+            : '<button class="btn btn-primary" onclick="fsActivate(\'' + fileName + '\')">Activate</button>') +
+          '<button class="btn btn-danger" onclick="fsDeleteSkin(\'' + fileName + '\',\'' + name + '\')">Delete</button>' +
           '</div></div>';
       }).join('');
     }

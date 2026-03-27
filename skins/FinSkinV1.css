@@ -1,0 +1,291 @@
+/* ═══════════════════════════════════════════════════════════════
+   FinSkin V1 — Deep dark · Purple accent · Safe overrides only
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --a:          #7c6af7;
+  --a-dim:      #5a4fd4;
+  --a-bright:   #9d8fff;
+  --a-glow:     rgba(124,106,247,0.28);
+  --a-glow-sm:  rgba(124,106,247,0.15);
+  --a-border:   rgba(124,106,247,0.32);
+  --a-fill:     rgba(124,106,247,0.10);
+  --a-fill2:    rgba(124,106,247,0.16);
+  --a-grad:     linear-gradient(135deg, #7c6af7, #5a4fd4);
+
+  --bg:         #0d0d0f;
+  --s1:         #141417;
+  --s2:         #1c1c21;
+  --s3:         #242429;
+
+  --t1:         #f0f0f5;
+  --t2:         #9090a0;
+  --t3:         #55555f;
+
+  --b1:         rgba(255,255,255,0.07);
+  --b2:         rgba(255,255,255,0.11);
+  --b3:         rgba(255,255,255,0.16);
+}
+
+/* ── Base ────────────────────────────────────────────────────── */
+html, body {
+  background-color: var(--bg) !important;
+  color: var(--t1) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+.page { background: transparent !important; }
+
+.backdropContainer,
+.backgroundContainer {
+  opacity: 0.10 !important;
+  filter: blur(60px) saturate(40%) !important;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar             { width: 4px; height: 4px; }
+::-webkit-scrollbar-track       { background: transparent; }
+::-webkit-scrollbar-thumb       { background: var(--a-border); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--a); }
+
+/* ── Header ──────────────────────────────────────────────────── */
+.skinHeader, #skinHeader {
+  background: rgba(13,13,15,0.95) !important;
+  border-bottom: 1px solid var(--b1) !important;
+  box-shadow: 0 1px 0 var(--b1) !important;
+}
+
+.headerSearchInput {
+  background: var(--s2) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: 999px !important;
+  color: var(--t1) !important;
+}
+
+.headerSearchInput:focus {
+  border-color: var(--a-border) !important;
+  box-shadow: 0 0 0 3px var(--a-glow-sm) !important;
+  outline: none !important;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+.mainDrawer, .mainDrawerContent, .mainDrawerPanel, .drawer {
+  background-color: var(--s1) !important;
+  border-right: 1px solid var(--b1) !important;
+}
+
+.navMenuOption, .drawerMenuItem {
+  color: var(--t2) !important;
+  border-radius: 9px !important;
+  margin: 2px 8px !important;
+  transition: background 0.15s, color 0.15s !important;
+}
+
+.navMenuOption:hover, .drawerMenuItem:hover {
+  background-color: var(--s2) !important;
+  color: var(--t1) !important;
+}
+
+.selectedMenuOption,
+.navMenuOption.selectedMenuOption,
+.drawerMenuItem.selectedDrawerMenuItem {
+  background-color: var(--a-fill) !important;
+  color: var(--a-bright) !important;
+}
+
+/* ── Cards ───────────────────────────────────────────────────── */
+.cardBox {
+  background-color: var(--s2) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: 12px !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.card:hover .cardBox {
+  border-color: var(--a-border) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.65), 0 0 0 1px var(--a-border) !important;
+}
+
+.card {
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+
+.card:hover {
+  transform: translateY(-4px) !important;
+}
+
+.cardText, .cardTextRow {
+  color: var(--t1) !important;
+  font-weight: 600 !important;
+}
+
+.cardTextSecondary { color: var(--t2) !important; }
+
+/* Progress bar */
+.itemProgressBarForeground,
+.cardProgressBarForeground {
+  background: var(--a-grad) !important;
+  border-radius: 999px !important;
+}
+
+/* Badges */
+.playedIndicator,
+.countIndicator,
+.unplayedCount {
+  background: var(--a-grad) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  border-radius: 999px !important;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.emby-button.raised, button.raised {
+  background-color: var(--s2) !important;
+  border: 1px solid var(--b1) !important;
+  color: var(--t2) !important;
+  border-radius: 9px !important;
+  transition: background 0.15s, color 0.15s, border-color 0.15s !important;
+}
+
+.emby-button.raised:hover, button.raised:hover {
+  background-color: var(--s3) !important;
+  color: var(--t1) !important;
+  border-color: var(--b2) !important;
+}
+
+.emby-button.accent, .button-accent, .raised.accent,
+.fab, .detailButton-primary {
+  background: var(--a-grad) !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 600 !important;
+  border-radius: 9px !important;
+  box-shadow: 0 4px 16px var(--a-glow-sm) !important;
+}
+
+.emby-button.accent:hover, .fab:hover, .detailButton-primary:hover {
+  filter: brightness(1.10) !important;
+  box-shadow: 0 6px 24px var(--a-glow) !important;
+}
+
+/* ── Section / Page titles ───────────────────────────────────── */
+.sectionTitle, .sectionTitleButton, .sectionTitleTextButton {
+  font-weight: 700 !important;
+  color: var(--t1) !important;
+}
+
+.pageTitle {
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  background: linear-gradient(110deg, var(--t1) 40%, var(--a) 110%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* ── Detail page ─────────────────────────────────────────────── */
+.detailPagePrimaryContainer, .detailPageContent {
+  background-color: var(--s1) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: 16px !important;
+}
+
+.overview {
+  color: var(--t2) !important;
+  line-height: 1.7 !important;
+}
+
+/* ── Inputs ──────────────────────────────────────────────────── */
+.emby-input, .emby-textarea, .emby-select {
+  background-color: var(--s2) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: 9px !important;
+  color: var(--t1) !important;
+}
+
+.emby-input:focus, .emby-textarea:focus, .emby-select:focus {
+  border-color: var(--a-border) !important;
+  box-shadow: 0 0 0 3px var(--a-glow-sm) !important;
+  outline: none !important;
+}
+
+.inputLabel, .checkboxLabel {
+  color: var(--t2) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+}
+
+/* ── Lists ───────────────────────────────────────────────────── */
+.paperList {
+  background-color: var(--s2) !important;
+  border: 1px solid var(--b1) !important;
+  border-radius: 12px !important;
+}
+
+.listItem { border-bottom: 1px solid var(--b1) !important; }
+.listItem:last-child { border-bottom: none !important; }
+.listItem:hover { background-color: var(--s3) !important; }
+
+/* ── Dialogs ─────────────────────────────────────────────────── */
+.dialog, .focuscontainer-dialog {
+  background-color: var(--s1) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.75) !important;
+}
+
+/* ── Tabs ────────────────────────────────────────────────────── */
+.emby-tab-button { color: var(--t2) !important; }
+
+.emby-tab-button.emby-tab-button-active,
+.is-active.emby-tab-button {
+  color: var(--a-bright) !important;
+  font-weight: 700 !important;
+}
+
+.emby-tabs-slider {
+  background: var(--a-grad) !important;
+  border-radius: 999px !important;
+}
+
+/* ── Chips ───────────────────────────────────────────────────── */
+.chip, .genreButton, .tagButton {
+  background-color: var(--a-fill) !important;
+  border: 1px solid var(--a-border) !important;
+  border-radius: 999px !important;
+  color: var(--a-bright) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+/* ── OSD ─────────────────────────────────────────────────────── */
+.osdControls, .videoOsdBottom {
+  background-color: rgba(20,20,23,0.92) !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--b2) !important;
+  margin: 0 16px 16px !important;
+}
+
+.osdPositionSlider::-webkit-slider-thumb,
+.osdVolumeSlider::-webkit-slider-thumb,
+.mdl-slider::-webkit-slider-thumb {
+  background: var(--a) !important;
+  box-shadow: 0 0 10px var(--a-glow) !important;
+}
+
+/* ── Links & Focus ───────────────────────────────────────────── */
+a { color: var(--a-bright) !important; }
+a:hover { color: var(--a) !important; }
+
+*:focus-visible {
+  outline: 2px solid var(--a) !important;
+  outline-offset: 3px !important;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────── */
+.progressring path, .mdl-spinner__layer {
+  stroke: var(--a) !important;
+}
