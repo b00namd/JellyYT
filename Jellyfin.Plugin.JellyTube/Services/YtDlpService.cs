@@ -148,6 +148,12 @@ public class YtDlpService
                 psi.ArgumentList.Add(config.FfmpegBinaryPath);
             }
 
+            if (!string.IsNullOrWhiteSpace(config.CookiesFilePath))
+            {
+                psi.ArgumentList.Add("--cookies");
+                psi.ArgumentList.Add(config.CookiesFilePath);
+            }
+
             if (config.DownloadThumbnails)
                 psi.ArgumentList.Add("--write-thumbnail");
 
@@ -270,6 +276,12 @@ public class YtDlpService
         if (!string.IsNullOrWhiteSpace(config.DefaultAudioLanguage))
         {
             opts.PostprocessorArgs = $"ffmpeg:-metadata:s:a:0 language={config.DefaultAudioLanguage.Trim()}";
+        }
+
+        // Use cookies file for authenticated downloads (e.g. age-restricted or PO Token required)
+        if (!string.IsNullOrWhiteSpace(config.CookiesFilePath))
+        {
+            opts.Cookies = config.CookiesFilePath;
         }
 
         // Use archive file to skip already-downloaded (or deleted) videos

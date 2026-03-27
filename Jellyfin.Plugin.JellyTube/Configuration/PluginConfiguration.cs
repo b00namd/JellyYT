@@ -94,4 +94,10 @@ public class PluginConfiguration : BasePluginConfiguration
     /// Leave empty to not set a language tag.
     /// </summary>
     public string DefaultAudioLanguage { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the path to a Netscape-format cookies file for authenticated YouTube downloads.
+    /// Leave empty to download without cookies.
+    /// </summary>
+    public string CookiesFilePath { get; set; } = string.Empty;
 }

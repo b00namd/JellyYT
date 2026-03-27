@@ -245,6 +245,13 @@
                         </div>
 
                         <div class="inputContainer">
+                            <label class="inputLabel" for="CookiesFilePath">Cookies-Datei (optional)</label>
+                            <input id="CookiesFilePath" name="CookiesFilePath" type="text" is="emby-input"
+                                   placeholder="/config/cookies.txt" style="max-width:500px;" />
+                            <div class="fieldDescription">Pfad zu einer Netscape-Format cookies.txt (z.B. aus Browser exportiert). Wird für Videos benötigt, die einen YouTube-Login erfordern (PO Token, Altersbeschränkung). <a href="https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp" target="_blank">Anleitung</a></div>
+                        </div>
+
+                        <div class="inputContainer">
                             <label class="inputLabel" for="DefaultAudioLanguage">Standard-Audiosprache</label>
                             <input id="DefaultAudioLanguage" name="DefaultAudioLanguage" type="text" is="emby-input"
                                    placeholder="deu" style="max-width:120px;" />

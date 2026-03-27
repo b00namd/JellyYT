@@ -187,6 +187,12 @@
             Leave empty to not set a language tag.
             </summary>
         </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.CookiesFilePath">
+            <summary>
+            Gets or sets the path to a Netscape-format cookies file for authenticated YouTube downloads.
+            Leave empty to download without cookies.
+            </summary>
+        </member>
         <member name="T:Jellyfin.Plugin.JellyTube.Helpers.DateParser">
             <summary>
             Utility for parsing yt-dlp date strings.

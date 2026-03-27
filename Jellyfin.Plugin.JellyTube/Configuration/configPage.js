@@ -135,6 +135,7 @@
             document.getElementById('DownloadSubtitles').checked        = !!config.DownloadSubtitles;
             document.getElementById('SubtitleLanguages').value          = config.SubtitleLanguages || '';
             document.getElementById('DefaultAudioLanguage').value       = config.DefaultAudioLanguage || '';
+            document.getElementById('CookiesFilePath').value            = config.CookiesFilePath || '';
             document.getElementById('WriteNfoFiles').checked            = !!config.WriteNfoFiles;
             document.getElementById('DownloadThumbnails').checked       = !!config.DownloadThumbnails;
             document.getElementById('TriggerLibraryScanAfterDownload').checked = !!config.TriggerLibraryScanAfterDownload;
@@ -159,6 +160,7 @@
             config.DownloadSubtitles          = document.getElementById('DownloadSubtitles').checked;
             config.SubtitleLanguages          = document.getElementById('SubtitleLanguages').value;
             config.DefaultAudioLanguage       = document.getElementById('DefaultAudioLanguage').value;
+            config.CookiesFilePath            = document.getElementById('CookiesFilePath').value;
             config.WriteNfoFiles              = document.getElementById('WriteNfoFiles').checked;
             config.DownloadThumbnails         = document.getElementById('DownloadThumbnails').checked;
             config.TriggerLibraryScanAfterDownload = document.getElementById('TriggerLibraryScanAfterDownload').checked;
