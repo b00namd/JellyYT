@@ -156,12 +156,12 @@ public class DownloadWorkerService : BackgroundService
 
         var config = Plugin.Instance!.Configuration;
 
-        if (config.WriteNfoFiles || config.DownloadThumbnails)
+        if (config.WriteNfoFiles || config.DownloadThumbnails || (job.IsScheduled && (job.DeleteWatched || config.DeleteWatchedScheduledVideos)))
         {
             if (job.IsPlaylist)
             {
                 // For playlists yt-dlp writes a .info.json per video — parse each to build full NFO/thumbnails
-                await WritePlaylistMetadataAsync(outputDir, ct);
+                await WritePlaylistMetadataAsync(outputDir, job, ct);
             }
             else
             {
@@ -172,7 +172,7 @@ public class DownloadWorkerService : BackgroundService
                     job.DownloadedFilePath = videoFile;
 
                     // Write marker file so WatchedVideoCleanupService can delete the file even after a restart
-                    if (job.IsScheduled && job.DeleteWatched)
+                    if (job.IsScheduled && (job.DeleteWatched || config.DeleteWatchedScheduledVideos))
                     {
                         var markerPath = Path.ChangeExtension(videoFile, ".delete-watched");
                         try { await File.WriteAllTextAsync(markerPath, string.Empty, ct); }
@@ -211,10 +211,11 @@ public class DownloadWorkerService : BackgroundService
         }
     }
 
-    private async Task WritePlaylistMetadataAsync(string outputDir, CancellationToken ct)
+    private async Task WritePlaylistMetadataAsync(string outputDir, DownloadJob job, CancellationToken ct)
     {
         var config = Plugin.Instance!.Configuration;
         string? lastThumbnailUrl = null;
+        var writeDeleteMarker = job.IsScheduled && (job.DeleteWatched || config.DeleteWatchedScheduledVideos);
 
         foreach (var jsonPath in Directory.EnumerateFiles(outputDir, "*.info.json"))
         {
@@ -225,6 +226,13 @@ public class DownloadWorkerService : BackgroundService
             var videoFile = LocateDownloadedFile(outputDir, videoMeta.VideoId);
             if (videoFile is null)
                 continue;
+
+            if (writeDeleteMarker)
+            {
+                var markerPath = Path.ChangeExtension(videoFile, ".delete-watched");
+                try { await File.WriteAllTextAsync(markerPath, string.Empty, ct); }
+                catch (Exception ex) { _logger.LogWarning(ex, "Could not write delete-watched marker for '{Path}'.", videoFile); }
+            }
 
             if (config.WriteNfoFiles)
             {
