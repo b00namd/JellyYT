@@ -181,6 +181,11 @@
             Gets or sets a value indicating whether watched videos from scheduled downloads are automatically deleted.
             </summary>
         </member>
+        <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.DeleteWatchedManualVideos">
+            <summary>
+            Gets or sets a value indicating whether watched videos from manual downloads are automatically deleted.
+            </summary>
+        </member>
         <member name="P:Jellyfin.Plugin.JellyTube.Configuration.PluginConfiguration.DefaultAudioLanguage">
             <summary>
             Gets or sets the default audio language tag to embed in downloaded files (e.g. "deu", "eng", "fra").

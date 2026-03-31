@@ -279,6 +279,13 @@
                             </label>
                         </div>
 
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label class="emby-checkbox-label">
+                                <input id="DeleteWatchedManualVideos" name="DeleteWatchedManualVideos" type="checkbox" is="emby-checkbox" />
+                                <span>Gesehene Videos (manuell heruntergeladen) automatisch löschen</span>
+                            </label>
+                        </div>
+
                         <h3>Geplante Downloads</h3>
                         <div class="fieldDescription" style="margin-bottom:1em;">
                             Der geplante Task läuft standardmäßig <strong>stündlich</strong>. Das Intervall kann unter
@@ -290,6 +297,14 @@
                                 <input id="EnableScheduledDownloads" name="EnableScheduledDownloads" type="checkbox" is="emby-checkbox" />
                                 <span>Geplante Playlist-Downloads aktivieren</span>
                             </label>
+                        </div>
+
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label class="emby-checkbox-label">
+                                <input id="DeleteWatchedScheduledVideos" name="DeleteWatchedScheduledVideos" type="checkbox" is="emby-checkbox" />
+                                <span>Gesehene Videos (alle geplanten Einträge) automatisch löschen</span>
+                            </label>
+                            <div class="fieldDescription">Überschreibt die Einzel-Einstellung pro Eintrag in der Tabelle unten.</div>
                         </div>
 
                         <div class="inputContainer">

@@ -139,7 +139,9 @@
             document.getElementById('WriteNfoFiles').checked            = !!config.WriteNfoFiles;
             document.getElementById('DownloadThumbnails').checked       = !!config.DownloadThumbnails;
             document.getElementById('TriggerLibraryScanAfterDownload').checked = !!config.TriggerLibraryScanAfterDownload;
+            document.getElementById('DeleteWatchedManualVideos').checked = !!config.DeleteWatchedManualVideos;
             document.getElementById('EnableScheduledDownloads').checked = !!config.EnableScheduledDownloads;
+            document.getElementById('DeleteWatchedScheduledVideos').checked = !!config.DeleteWatchedScheduledVideos;
 
             renderScheduledEntries(config.ScheduledEntries || []);
         });
@@ -164,7 +166,9 @@
             config.WriteNfoFiles              = document.getElementById('WriteNfoFiles').checked;
             config.DownloadThumbnails         = document.getElementById('DownloadThumbnails').checked;
             config.TriggerLibraryScanAfterDownload = document.getElementById('TriggerLibraryScanAfterDownload').checked;
+            config.DeleteWatchedManualVideos  = document.getElementById('DeleteWatchedManualVideos').checked;
             config.EnableScheduledDownloads   = document.getElementById('EnableScheduledDownloads').checked;
+            config.DeleteWatchedScheduledVideos = document.getElementById('DeleteWatchedScheduledVideos').checked;
             config.ScheduledEntries           = collectScheduledEntries();
 
             ApiClient.updatePluginConfiguration(PLUGIN_ID, config).then(function () {
