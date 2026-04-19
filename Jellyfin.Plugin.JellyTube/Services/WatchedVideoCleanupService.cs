@@ -67,31 +67,63 @@ public class WatchedVideoCleanupService : IHostedService
         if (string.IsNullOrEmpty(filePath))
             return;
 
-        // Find a matching completed scheduled download job
+        // Find a matching completed scheduled download job still in memory
         var job = _queue.GetAllJobs().FirstOrDefault(j =>
             j.IsScheduled &&
             j.Status == DownloadJobStatus.Completed &&
             j.DownloadedFilePath != null &&
             string.Equals(j.DownloadedFilePath, filePath, StringComparison.OrdinalIgnoreCase));
 
-        // Marker file is written at download time and survives restarts
+        // Marker file written at download time survives restarts
         var markerPath = Path.ChangeExtension(filePath, ".delete-watched");
         var hasMarker = File.Exists(markerPath);
 
+        // Fallback: check if the file lives under a scheduled entry's download path with DeleteWatched=true
+        bool isUnderScheduledEntry = false;
         if (job is null && !hasMarker)
-            return;
+        {
+            isUnderScheduledEntry = config.DeleteWatchedScheduledVideos ||
+                config.ScheduledEntries.Any(entry =>
+                {
+                    var effectivePath = string.IsNullOrWhiteSpace(entry.DownloadPath)
+                        ? config.DownloadPath
+                        : entry.DownloadPath;
+                    return entry.DeleteWatched &&
+                           !string.IsNullOrWhiteSpace(effectivePath) &&
+                           filePath.StartsWith(effectivePath, StringComparison.OrdinalIgnoreCase);
+                });
 
-        // Per-job setting or marker takes priority; fall back to global DeleteWatchedScheduledVideos
-        var shouldDelete = hasMarker || (job?.DeleteWatched ?? false) || config.DeleteWatchedScheduledVideos;
+            // Also check manual-download setting against global download path
+            if (!isUnderScheduledEntry && config.DeleteWatchedManualVideos &&
+                !string.IsNullOrWhiteSpace(config.DownloadPath) &&
+                filePath.StartsWith(config.DownloadPath, StringComparison.OrdinalIgnoreCase))
+            {
+                isUnderScheduledEntry = true;
+            }
+
+            if (!isUnderScheduledEntry)
+                return;
+        }
+
+        var shouldDelete = hasMarker || isUnderScheduledEntry || (job?.DeleteWatched ?? false) || config.DeleteWatchedScheduledVideos;
         if (!shouldDelete)
             return;
 
-        _logger.LogInformation("Watched scheduled video '{Path}', deleting file.", filePath);
+        _logger.LogInformation("Watched video '{Path}', deleting file.", filePath);
 
-        // Add to archive so yt-dlp won't re-download it
-        if (job.Metadata?.VideoId is { Length: > 0 } videoId)
+        // Extract video ID from filename (pattern: "Title - <videoId>.ext") and add to archive
+        var stem = Path.GetFileNameWithoutExtension(filePath);
+        var dashIdx = stem.LastIndexOf(" - ", StringComparison.Ordinal);
+        if (dashIdx >= 0)
         {
-            _archive.Add(videoId);
+            var videoId = stem[(dashIdx + 3)..];
+            if (!string.IsNullOrWhiteSpace(videoId))
+                _archive.Add(videoId);
+        }
+
+        if (job?.Metadata?.VideoId is { Length: > 0 } jobVideoId)
+        {
+            _archive.Add(jobVideoId);
         }
 
         // Delete video file and all related sidecar files (.nfo, thumbnail, subtitles)
