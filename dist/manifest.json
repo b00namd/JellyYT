@@ -3,10 +3,10 @@
         "owner":  "local",
         "versions":  [
                          {
-                             "changelog":  "Initiale Version",
+                             "changelog":  "Cookies-Unterstützung, gesehene Videos automatisch löschen (manuell + geplant), Startup-Scan für bereits gesehene Videos, 2K/4K Qualitätsoptionen",
                              "version":  "1.0.0.0",
-                             "checksum":  "ee48ee705a3098b21756d200721d61b1",
-                             "timestamp":  "2026-03-26T16:04:20Z",
+                             "checksum":  "b20d6eb5444158dcaf35b1c9bb7d2f6e",
+                             "timestamp":  "2026-04-19T00:00:00Z",
                              "targetAbi":  "10.9.0.0",
                              "sourceUrl":  "https://raw.githubusercontent.com/b00namd/JellyFinPlugins/master/dist/Jellyfin.Plugin.JellyTube_1.0.0.0.zip"
                          }
