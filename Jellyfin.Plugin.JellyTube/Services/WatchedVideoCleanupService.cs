@@ -17,9 +17,12 @@ namespace Jellyfin.Plugin.JellyTube.Services;
 /// </summary>
 public class WatchedVideoCleanupService : IHostedService
 {
+    private static readonly string[] VideoExtensions = { ".mp4", ".mkv", ".webm", ".avi", ".mov" };
+
     private readonly DownloadQueueService _queue;
     private readonly DownloadArchiveService _archive;
     private readonly IUserDataManager _userDataManager;
+    private readonly IUserManager _userManager;
     private readonly ILibraryManager _libraryManager;
     private readonly ILogger<WatchedVideoCleanupService> _logger;
 
@@ -30,12 +33,14 @@ public class WatchedVideoCleanupService : IHostedService
         DownloadQueueService queue,
         DownloadArchiveService archive,
         IUserDataManager userDataManager,
+        IUserManager userManager,
         ILibraryManager libraryManager,
         ILogger<WatchedVideoCleanupService> logger)
     {
         _queue = queue;
         _archive = archive;
         _userDataManager = userDataManager;
+        _userManager = userManager;
         _libraryManager = libraryManager;
         _logger = logger;
     }
@@ -44,6 +49,14 @@ public class WatchedVideoCleanupService : IHostedService
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _userDataManager.UserDataSaved += OnUserDataSaved;
+
+        // Run startup scan after a short delay to let Jellyfin finish initializing
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(TimeSpan.FromMinutes(2), cancellationToken).ConfigureAwait(false);
+            await ScanAndDeleteWatchedAsync(cancellationToken).ConfigureAwait(false);
+        }, cancellationToken);
+
         return Task.CompletedTask;
     }
 
@@ -82,25 +95,7 @@ public class WatchedVideoCleanupService : IHostedService
         bool isUnderScheduledEntry = false;
         if (job is null && !hasMarker)
         {
-            isUnderScheduledEntry = config.DeleteWatchedScheduledVideos ||
-                config.ScheduledEntries.Any(entry =>
-                {
-                    var effectivePath = string.IsNullOrWhiteSpace(entry.DownloadPath)
-                        ? config.DownloadPath
-                        : entry.DownloadPath;
-                    return entry.DeleteWatched &&
-                           !string.IsNullOrWhiteSpace(effectivePath) &&
-                           filePath.StartsWith(effectivePath, StringComparison.OrdinalIgnoreCase);
-                });
-
-            // Also check manual-download setting against global download path
-            if (!isUnderScheduledEntry && config.DeleteWatchedManualVideos &&
-                !string.IsNullOrWhiteSpace(config.DownloadPath) &&
-                filePath.StartsWith(config.DownloadPath, StringComparison.OrdinalIgnoreCase))
-            {
-                isUnderScheduledEntry = true;
-            }
-
+            isUnderScheduledEntry = ShouldDeleteBasedOnPath(filePath, config);
             if (!isUnderScheduledEntry)
                 return;
         }
@@ -109,6 +104,83 @@ public class WatchedVideoCleanupService : IHostedService
         if (!shouldDelete)
             return;
 
+        DeleteWatchedFile(filePath, job?.Metadata?.VideoId);
+    }
+
+    private async Task ScanAndDeleteWatchedAsync(CancellationToken ct)
+    {
+        var config = Plugin.Instance?.Configuration;
+        if (config is null)
+            return;
+
+        var users = _userManager.Users.ToList();
+        if (users.Count == 0)
+            return;
+
+        // Collect all paths that should have delete-watched enabled
+        var pathsToScan = config.ScheduledEntries
+            .Where(e => e.DeleteWatched)
+            .Select(e => string.IsNullOrWhiteSpace(e.DownloadPath) ? config.DownloadPath : e.DownloadPath)
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (config.DeleteWatchedScheduledVideos && !string.IsNullOrWhiteSpace(config.DownloadPath))
+            pathsToScan.Add(config.DownloadPath);
+
+        if (config.DeleteWatchedManualVideos && !string.IsNullOrWhiteSpace(config.DownloadPath))
+            pathsToScan.Add(config.DownloadPath);
+
+        pathsToScan = pathsToScan.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
+        if (pathsToScan.Count == 0)
+            return;
+
+        _logger.LogInformation("Starting watched-video startup scan across {Count} path(s).", pathsToScan.Count);
+        int deleted = 0;
+
+        foreach (var basePath in pathsToScan)
+        {
+            if (!Directory.Exists(basePath))
+                continue;
+
+            foreach (var filePath in Directory.EnumerateFiles(basePath, "*.*", SearchOption.AllDirectories))
+            {
+                if (ct.IsCancellationRequested)
+                    return;
+
+                if (!IsVideoFile(filePath))
+                    continue;
+
+                var item = _libraryManager.FindByPath(filePath, false);
+                if (item is null)
+                    continue;
+
+                var isPlayed = users.Any(user =>
+                    _userDataManager.GetUserData(user, item).Played);
+
+                if (!isPlayed)
+                    continue;
+
+                _logger.LogInformation("Startup scan: deleting already-watched '{Path}'.", filePath);
+                DeleteWatchedFile(filePath, videoId: null);
+                deleted++;
+            }
+        }
+
+        if (deleted > 0)
+        {
+            _logger.LogInformation("Startup scan complete: deleted {Count} watched video(s).", deleted);
+            _libraryManager.QueueLibraryScan();
+        }
+        else
+        {
+            _logger.LogInformation("Startup scan complete: no watched videos to delete.");
+        }
+    }
+
+    private void DeleteWatchedFile(string filePath, string? videoId)
+    {
         _logger.LogInformation("Watched video '{Path}', deleting file.", filePath);
 
         // Extract video ID from filename (pattern: "Title - <videoId>.ext") and add to archive
@@ -116,21 +188,43 @@ public class WatchedVideoCleanupService : IHostedService
         var dashIdx = stem.LastIndexOf(" - ", StringComparison.Ordinal);
         if (dashIdx >= 0)
         {
-            var videoId = stem[(dashIdx + 3)..];
-            if (!string.IsNullOrWhiteSpace(videoId))
-                _archive.Add(videoId);
+            var extractedId = stem[(dashIdx + 3)..];
+            if (!string.IsNullOrWhiteSpace(extractedId))
+                _archive.Add(extractedId);
         }
 
-        if (job?.Metadata?.VideoId is { Length: > 0 } jobVideoId)
-        {
-            _archive.Add(jobVideoId);
-        }
+        if (!string.IsNullOrWhiteSpace(videoId))
+            _archive.Add(videoId);
 
-        // Delete video file and all related sidecar files (.nfo, thumbnail, subtitles)
         DeleteWithSidecars(filePath);
-
-        // Trigger library scan so Jellyfin removes the item from its database
         _libraryManager.QueueLibraryScan();
+    }
+
+    private static bool ShouldDeleteBasedOnPath(string filePath, Configuration.PluginConfiguration config)
+    {
+        if (config.DeleteWatchedScheduledVideos)
+            return true;
+
+        if (config.DeleteWatchedManualVideos &&
+            !string.IsNullOrWhiteSpace(config.DownloadPath) &&
+            filePath.StartsWith(config.DownloadPath, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return config.ScheduledEntries.Any(entry =>
+        {
+            var effectivePath = string.IsNullOrWhiteSpace(entry.DownloadPath)
+                ? config.DownloadPath
+                : entry.DownloadPath;
+            return entry.DeleteWatched &&
+                   !string.IsNullOrWhiteSpace(effectivePath) &&
+                   filePath.StartsWith(effectivePath, StringComparison.OrdinalIgnoreCase);
+        });
+    }
+
+    private static bool IsVideoFile(string path)
+    {
+        var ext = Path.GetExtension(path);
+        return VideoExtensions.Any(e => string.Equals(e, ext, StringComparison.OrdinalIgnoreCase));
     }
 
     private void DeleteWithSidecars(string videoPath)

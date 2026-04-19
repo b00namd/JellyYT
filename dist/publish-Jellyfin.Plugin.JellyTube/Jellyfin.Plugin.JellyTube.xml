@@ -623,7 +623,7 @@
             download archive so they are not re-downloaded.
             </summary>
         </member>
-        <member name="M:Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService.#ctor(Jellyfin.Plugin.JellyTube.Services.DownloadQueueService,Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService,MediaBrowser.Controller.Library.IUserDataManager,MediaBrowser.Controller.Library.ILibraryManager,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService})">
+        <member name="M:Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService.#ctor(Jellyfin.Plugin.JellyTube.Services.DownloadQueueService,Jellyfin.Plugin.JellyTube.Services.DownloadArchiveService,MediaBrowser.Controller.Library.IUserDataManager,MediaBrowser.Controller.Library.IUserManager,MediaBrowser.Controller.Library.ILibraryManager,Microsoft.Extensions.Logging.ILogger{Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService})">
             <summary>
             Initializes a new instance of the <see cref="T:Jellyfin.Plugin.JellyTube.Services.WatchedVideoCleanupService"/> class.
             </summary>
